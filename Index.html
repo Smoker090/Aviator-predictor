@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Aviator Predictor</title>
+  <style>
+    body { font-family: sans-serif; padding: 1rem; background: #f4f4f4; }
+    button { padding: 0.5rem 1rem; font-size: 1rem; }
+    pre { background: #fff; padding: 1rem; margin-top: 1rem; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Aviator Predictor</h1>
+  <button id="predict">Get Prediction</button>
+  <pre id="output">Waiting for prediction...</pre>
+
+  <script>
+    document.getElementById('predict').onclick = () => {
+      const multiplier = +(Math.random() * 9 + 1).toFixed(2);
+      const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+      const advice = multiplier >= 2.5
+        ? '✅ Play next round: target 2x–3x'
+        : '⚠️ Hold off—wait for safer round';
+      document.getElementById('output').textContent = `${time} → ${multiplier}x\n${advice}`;
+    };
+  </script>
+</body>
+</html>
