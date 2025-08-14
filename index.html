@@ -8,91 +8,70 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      text-align: center;
       padding: 20px;
-      background: #f4f4f4;
     }
-    h2 {
-      color: #d32f2f;
+    .box {
+      background: #222;
+      padding: 15px;
+      margin: 10px auto;
+      border-radius: 10px;
+      max-width: 400px;
     }
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: bold;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      font-size: 16px;
-    }
+    .pink { color: #ff69b4; font-weight: bold; }
+    .safe { color: #00ffcc; }
+    .risk { color: #ff4444; }
     button {
-      background-color: #d32f2f;
-      color: white;
+      margin: 10px;
+      padding: 10px 20px;
+      background: #444;
+      color: #fff;
       border: none;
-      cursor: pointer;
-      margin-top: 20px;
+      border-radius: 5px;
     }
     button:hover {
-      background-color: #b71c1c;
-    }
-    #result {
-      margin-top: 20px;
-      font-weight: bold;
-      color: #2e7d32;
-    }
-    #log {
-      margin-top: 10px;
-      font-size: 14px;
-      color: #555;
+      background: #666;
     }
   </style>
 </head>
 <body>
-
-  <h2>Aviator Predictor</h2>
-
-  <label for="crashInput">Enter last crash value:</label>
-  <input type="text" id="crashInput" placeholder="e.g. 1.2" />
-
-  <label for="riskMode">Select risk mode:</label>
-  <select id="riskMode">
-    <option value="safe">Safe</option>
-    <option value="aggressive">Aggressive</option>
-  </select>
-
-  <button onclick="predictNext()">Predict Next</button>
-
-  <div id="result"></div>
-  <div id="log"></div>
+  <h1>Aviator Predictor</h1>
+  <div class="box">
+    <p>Next Prediction: <span id="prediction">...</span></p>
+    <p>Strategy Mode: <span id="strategy">...</span></p>
+    <p>Crash Risk: <span id="risk">...</span></p>
+    <p class="pink" id="pinkAlert"></p>
+  </div>
+  <button onclick="simulateRound()">Simulate Round</button>
+  <button onclick="toggleAutoMode()">Toggle Auto Mode</button>
 
   <script>
-    const history = [];
+    let history = [2.34, 2.23, 1.22, 7.83]; // Sample starting data
+    let autoMode = false;
+    let autoInterval = null;
 
-    function predictNext() {
-      const crashValue = parseFloat(document.getElementById("crashInput").value);
-      const riskMode = document.getElementById("riskMode").value;
-      const resultDiv = document.getElementById("result");
-      const logDiv = document.getElementById("log");
-
-      if (isNaN(crashValue)) {
-        resultDiv.textContent = "Please enter a valid number.";
-        return;
-      }
-
-      let prediction;
-      if (riskMode === "safe") {
-        prediction = crashValue + Math.random() * 0.5;
-      } else {
-        prediction = crashValue + Math.random() * 2;
-      }
-
-      prediction = Math.round(prediction * 100) / 100;
-      resultDiv.textContent = `Predicted next crash: ${prediction}x`;
-
-      history.push(`Crash: ${crashValue} → Predicted: ${prediction} (${riskMode})`);
-      logDiv.innerHTML = history.slice(-5).map(item => `<div>${item}</div>`).join("");
+    function simulateRound() {
+      const next = Math.random() * 10;
+      history.push(parseFloat(next.toFixed(2)));
+      updateUI(next);
     }
-  </script>
 
-</body>
-</html>
+    function getCrashRisk(history) {
+      const recent = history.slice(-5);
+      const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
+      if (avg < 2.0) return "High";
+      if (avg < 3.0) return "Medium";
+      return "Low";
+    }
+
+    function isPinkRoundLikely(history) {
+      const recent = history.slice(-5);
+      const lowRounds = recent.filter(r => r <= 2.0).length;
+      const lastPinkIndex = history.findLastIndex(r => r >= 7.0);
+      const pinkCooldown = lastPinkIndex === -1 ? history.length : history.length - lastPinkIndex;
+      return lowRounds >= 3 && pinkCooldown >= 10;
+    }
+
+    function getStrategyMode(history) {
