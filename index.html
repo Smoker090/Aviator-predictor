@@ -1,75 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aviator Predictor</title>
-  <link rel="manifest" href="manifest.json" />
-  <script>
-    function predictNextCrash(history, mode) {
-      const values = history.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
-      if (values.length < 3) return "Enter at least 3 crash values.";
+let history = [];
+let pinkCounter = 0;
 
-      const avg = values.reduce((a, b) => a + b, 0) / values.length;
-      let prediction;
+function predictNext() {
+  const input = parseFloat(document.getElementById("crashInput").value);
+  const mode = document.getElementById("riskMode").value;
+  let prediction = "Analyzing...";
 
-      if (mode === "safe") {
-        prediction = (avg * 0.85).toFixed(2);
-      } else if (mode === "risky") {
-        prediction = (avg * 1.2).toFixed(2);
-      } else {
-        prediction = avg.toFixed(2);
-      }
+  history.push(input);
+  if (history.length > 10) history.shift();
 
-      return `Next crash predicted at: ${prediction}x`;
-    }
+  const recentCrashes = history.filter(v => v < 1.5).length;
+  const recentGreens = history.filter(v => v >= 2.0).length;
 
-    function runPrediction() {
-      const history = document.getElementById("history").value;
-      const mode = document.getElementById("mode").value;
-      const result = predictNextCrash(history, mode);
-      document.getElementById("result").innerText = result;
-    }
+  // Crash Prediction
+  if (recentCrashes >= 3) {
+    prediction = "🛑 High crash risk! Play safe.";
+  } else if (recentGreens >= 3) {
+    prediction = "🚀 Possible pink round incoming!";
+    pinkCounter++;
+  } else {
+    prediction = mode === "safe" ? "🟢 Safe round likely." : "🔥 Try aggressive mode.";
+  }
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-  </script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #f5f5f5;
-    }
-    h1 {
-      color: #d32f2f;
-    }
-    input, select, button {
-      margin: 10px 0;
-      padding: 10px;
-      width: 100%;
-      max-width: 400px;
-      font-size: 16px;
-    }
-    #result {
-      margin-top: 20px;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <h1>Aviator Predictor</h1>
-  <label for="history">Enter recent crash values (comma-separated):</label>
-  <input type="text" id="history" placeholder="e.g. 1.2, 2.5, 1.8" />
-  
-  <label for="mode">Select risk mode:</label>
-  <select id="mode">
-    <option value="normal">Normal</option>
-    <option value="safe">Safe</option>
-    <option value="risky">Risky</option>
-  </select>
-  
-  <button onclick="runPrediction()">Predict Next</button>
-  <div id="result"></div>
-</body>
-</html>
+  // Pink Round Alert
+  if (pinkCounter >= 2) {
+    prediction += " 🎀 Pink Alert!";
+    pinkCounter = 0;
+  }
+
+  document.getElementById("result").innerText = prediction;
+}
