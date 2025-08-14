@@ -1,4 +1,17 @@
-<input type="text" id="crashInput" placeholder="Enter last crash value" />
+<h2>Aviator Predictor</h2>
+
+<label for="crashInput">Enter last crash value:</label>
+<input type="text" id="crashInput" placeholder="e.g. 1.2" />
+
+<label for="riskMode">Select risk mode:</label>
+<select id="riskMode">
+  <option value="safe">Safe</option>
+  <option value="aggressive">Aggressive</option>
+</select>
+
+<button onclick="predictNext()">Predict Next</button>
+
+<div id="result" style="margin-top: 20px; font-weight: bold;"></div><input type="text" id="crashInput" placeholder="Enter last crash value" />
 <select id="riskMode">
   <option value="safe">Safe</option>
   <option value="aggressive">Aggressive</option>
