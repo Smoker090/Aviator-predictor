@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Aviator Predictor</title>
+  <title>Aviator 2-Round Predictor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -17,20 +17,7 @@
       max-width: 400px;
       margin: auto;
     }
-    .recent {
-      background: #1a1a1a;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-    .recent span {
-      margin: 5px;
-      display: inline-block;
-      background: #333;
-      padding: 5px 10px;
-      border-radius: 5px;
-    }
-    input, select, button {
+    input, button {
       padding: 12px;
       margin: 10px 0;
       width: 100%;
@@ -39,7 +26,7 @@
       border: none;
     }
     button {
-      background: #00cc66;
+      background: #ff0055;
       color: white;
       font-weight: bold;
     }
@@ -57,77 +44,7 @@
     .log p {
       margin: 5px 0;
     }
-    .safe { color: #00ff99; }
-    .aggressive { color: #ff69b4; }
-    .adaptive { color: #66ccff; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>✈️ Aviator Predictor</h2>
-
-    <div class="recent" id="recentDisplay">
-      <strong>Recent Crashes:</strong><br>
-      <span>1.34x</span><span>2.07x</span><span>2.03x</span><span>28.01x</span><span>1.75x</span><span>2.56x</span><span>1.32x</span><span>2.88x</span>
-    </div>
-
-    <input id="crashInput" placeholder="Enter last crash (e.g. 1.83)">
-    <select id="riskMode">
-      <option value="safe">🛡 Safe</option>
-      <option value="aggressive">🔥 Aggressive</option>
-      <option value="adaptive">🎛 Adaptive</option>
-    </select>
-    <button onclick="predict()">Bet 1.00 USD</button>
-
-    <div class="prediction" id="predictionDisplay"></div>
-    <div class="log" id="historyLog"></div>
-  </div>
-
-  <script>
-    let history = [];
-
-    function predict() {
-      const lastCrash = parseFloat(document.getElementById('crashInput').value.trim());
-      const mode = document.getElementById('riskMode').value;
-      if (isNaN(lastCrash)) {
-        alert("Please enter a valid crash value.");
-        return;
-      }
-
-      let predicted;
-      const pinkChance = Math.random();
-
-      if (mode === "safe") {
-        predicted = lastCrash < 2
-          ? +(Math.random() * 1.5 + 1).toFixed(2)
-          : +(Math.random() * 1.2 + 1).toFixed(2);
-      } else if (mode === "aggressive") {
-        predicted = pinkChance < 0.1
-          ? +(Math.random() * 50 + 10).toFixed(2)
-          : +(Math.random() * 5 + 1.5).toFixed(2);
-      } else {
-        // Adaptive mode
-        if (lastCrash < 1.5) {
-          predicted = +(Math.random() * 10 + 2).toFixed(2); // rebound
-        } else if (lastCrash > 10) {
-          predicted = +(Math.random() * 2 + 1).toFixed(2); // cooldown
-        } else {
-          predicted = +(Math.random() * 3 + 1.2).toFixed(2); // balanced
-        }
-      }
-
-      document.getElementById('predictionDisplay').innerHTML = `Predicted: <strong>${predicted}x</strong>`;
-
-      history.unshift({ crash: lastCrash, predicted, mode });
-      if (history.length > 5) history.pop();
-
-      document.getElementById('historyLog').innerHTML = `
-        <h3>📜 Previous Predictions</h3>
-        ${history.map(h => `
-          <p>Crash: ${h.crash} → Predicted: ${h.predicted} <span class="${h.mode}">(${h.mode})</span></p>
-        `).join('')}
-      `;
-    }
-  </script>
-</body>
-</html>
