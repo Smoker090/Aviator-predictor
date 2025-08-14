@@ -1,82 +1,98 @@
-<h2>Aviator Predictor</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aviator Predictor</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f4f4f4;
+    }
+    h2 {
+      color: #d32f2f;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #d32f2f;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background-color: #b71c1c;
+    }
+    #result {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #2e7d32;
+    }
+    #log {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
 
-<label for="crashInput">Enter last crash value:</label>
-<input type="text" id="crashInput" placeholder="e.g. 1.2" />
+  <h2>Aviator Predictor</h2>
 
-<label for="riskMode">Select risk mode:</label>
-<select id="riskMode">
-  <option value="safe">Safe</option>
-  <option value="aggressive">Aggressive</option>
-</select>
+  <label for="crashInput">Enter last crash value:</label>
+  <input type="text" id="crashInput" placeholder="e.g. 1.2" />
 
-<button onclick="predictNext()">Predict Next</button>
+  <label for="riskMode">Select risk mode:</label>
+  <select id="riskMode">
+    <option value="safe">Safe</option>
+    <option value="aggressive">Aggressive</option>
+  </select>
 
-<div id="result" style="margin-top: 20px; font-weight: bold;"></div><input type="text" id="crashInput" placeholder="Enter last crash value" />
-<select id="riskMode">
-  <option value="safe">Safe</option>
-  <option value="aggressive">Aggressive</option>
-</select>
-<button onclick="predictNext()">Predict Next</button>
-<div id="result"></div><script>
-let history = [];
-let predictions = [];
-let pinkCounter = 0;
+  <button onclick="predictNext()">Predict Next</button>
 
-function predictNext() {
-  const input = parseFloat(document.getElementById("input").value);
-  const mode = document.getElementById("mode").value;
-  const resultBox = document.getElementById("result");
-  const logBox = document.getElementById("log");
+  <div id="result"></div>
+  <div id="log"></div>
 
-  if (isNaN(input)) {
-    resultBox.innerText = "❌ Please enter a valid number.";
-    return;
-  }
+  <script>
+    const history = [];
 
-  history.push(input);
-  if (history.length > 10) history.shift();
+    function predictNext() {
+      const crashValue = parseFloat(document.getElementById("crashInput").value);
+      const riskMode = document.getElementById("riskMode").value;
+      const resultDiv = document.getElementById("result");
+      const logDiv = document.getElementById("log");
 
-  const recentCrashes = history.filter(v => v < 1.5).length;
-  const recentGreens = history.filter(v => v >= 2.0).length;
+      if (isNaN(crashValue)) {
+        resultDiv.textContent = "Please enter a valid number.";
+        return;
+      }
 
-  let prediction = "";
-  let confidence = "";
-  let riskLevel = "";
+      let prediction;
+      if (riskMode === "safe") {
+        prediction = crashValue + Math.random() * 0.5;
+      } else {
+        prediction = crashValue + Math.random() * 2;
+      }
 
-  // Crash Risk Detection
-  if (recentCrashes >= 3) {
-    prediction = "🛑 High crash risk!";
-    confidence = "Low";
-    riskLevel = "Safe";
-  } else if (recentGreens >= 3) {
-    prediction = "🚀 Pink round likely!";
-    pinkCounter++;
-    confidence = "High";
-    riskLevel = "Aggressive";
-  } else {
-    prediction = "🟢 Balanced round expected.";
-    confidence = "Medium";
-    riskLevel = mode === "safe" ? "Safe" : "Aggressive";
-  }
+      prediction = Math.round(prediction * 100) / 100;
+      resultDiv.textContent = `Predicted next crash: ${prediction}x`;
 
-  // Pink Alert Trigger
-  if (pinkCounter >= 2) {
-    prediction += " 🎀 Pink Alert!";
-    pinkCounter = 0;
-  }
+      history.push(`Crash: ${crashValue} → Predicted: ${prediction} (${riskMode})`);
+      logDiv.innerHTML = history.slice(-5).map(item => `<div>${item}</div>`).join("");
+    }
+  </script>
 
-  // Save prediction to log
-  predictions.push(prediction);
-  if (predictions.length > 5) predictions.shift();
-
-  // Display result
-  resultBox.innerHTML = `
-    <strong>Prediction:</strong> ${prediction}<br>
-    <strong>Confidence:</strong> ${confidence}<br>
-    <strong>Risk Mode:</strong> ${riskLevel}
-  `;
-
-  // Display history
-  logBox.innerHTML = "<strong>Last Predictions:</strong><br>" + predictions.map(p => `• ${p}`).join("<br>");
-}
-      </script>
+</body>
+</html>
