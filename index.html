@@ -1,10 +1,18 @@
+<script>
 let history = [];
+let predictions = [];
 let pinkCounter = 0;
 
 function predictNext() {
-  const input = parseFloat(document.getElementById("crashInput").value);
-  const mode = document.getElementById("riskMode").value;
-  let prediction = "Analyzing...";
+  const input = parseFloat(document.getElementById("input").value);
+  const mode = document.getElementById("mode").value;
+  const resultBox = document.getElementById("result");
+  const logBox = document.getElementById("log");
+
+  if (isNaN(input)) {
+    resultBox.innerText = "❌ Please enter a valid number.";
+    return;
+  }
 
   history.push(input);
   if (history.length > 10) history.shift();
@@ -12,21 +20,44 @@ function predictNext() {
   const recentCrashes = history.filter(v => v < 1.5).length;
   const recentGreens = history.filter(v => v >= 2.0).length;
 
-  // Crash Prediction
+  let prediction = "";
+  let confidence = "";
+  let riskLevel = "";
+
+  // Crash Risk Detection
   if (recentCrashes >= 3) {
-    prediction = "🛑 High crash risk! Play safe.";
+    prediction = "🛑 High crash risk!";
+    confidence = "Low";
+    riskLevel = "Safe";
   } else if (recentGreens >= 3) {
-    prediction = "🚀 Possible pink round incoming!";
+    prediction = "🚀 Pink round likely!";
     pinkCounter++;
+    confidence = "High";
+    riskLevel = "Aggressive";
   } else {
-    prediction = mode === "safe" ? "🟢 Safe round likely." : "🔥 Try aggressive mode.";
+    prediction = "🟢 Balanced round expected.";
+    confidence = "Medium";
+    riskLevel = mode === "safe" ? "Safe" : "Aggressive";
   }
 
-  // Pink Round Alert
+  // Pink Alert Trigger
   if (pinkCounter >= 2) {
     prediction += " 🎀 Pink Alert!";
     pinkCounter = 0;
   }
 
-  document.getElementById("result").innerText = prediction;
+  // Save prediction to log
+  predictions.push(prediction);
+  if (predictions.length > 5) predictions.shift();
+
+  // Display result
+  resultBox.innerHTML = `
+    <strong>Prediction:</strong> ${prediction}<br>
+    <strong>Confidence:</strong> ${confidence}<br>
+    <strong>Risk Mode:</strong> ${riskLevel}
+  `;
+
+  // Display history
+  logBox.innerHTML = "<strong>Last Predictions:</strong><br>" + predictions.map(p => `• ${p}`).join("<br>");
 }
+      </script>
