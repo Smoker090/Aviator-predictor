@@ -4,74 +4,91 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aviator Predictor</title>
-  <link rel="manifest" href="manifest.json" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #eee;
-      text-align: center;
-      padding: 20px;
-    }
-    .box {
-      background: #222;
-      padding: 15px;
-      margin: 10px auto;
-      border-radius: 10px;
-      max-width: 400px;
-    }
-    .pink { color: #ff69b4; font-weight: bold; }
-    .safe { color: #00ffcc; }
-    .risk { color: #ff4444; }
-    button {
-      margin: 10px;
-      padding: 10px 20px;
-      background: #444;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-    }
-    button:hover {
-      background: #666;
-    }
+    body { font-family: Arial; padding: 20px; background: #111; color: #eee; }
+    input, button, select { padding: 10px; margin: 5px; font-size: 16px; }
+    .risk { color: red; font-weight: bold; }
+    .pink { color: hotpink; font-weight: bold; }
+    .safe { color: lightgreen; font-weight: bold; }
+    .risky { color: orange; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>Aviator Predictor</h1>
-  <div class="box">
-    <p>Next Prediction: <span id="prediction">...</span></p>
-    <p>Strategy Mode: <span id="strategy">...</span></p>
-    <p>Crash Risk: <span id="risk">...</span></p>
-    <p class="pink" id="pinkAlert"></p>
-  </div>
-  <button onclick="simulateRound()">Simulate Round</button>
-  <button onclick="toggleAutoMode()">Toggle Auto Mode</button>
+  <h2>🎯 Aviator Predictor</h2>
+  <input type="number" id="crashInput" placeholder="Enter last crash value" step="0.01" />
+  <select id="mode">
+    <option value="safe">🛡️ Safe Mode</option>
+    <option value="risky">🔥 Risky Mode</option>
+    <option value="pink">💗 Pink Hunter</option>
+  </select>
+  <button onclick="predictNext()">Predict Next</button>
+  <button onclick="clearHistory()">Clear History</button>
+  <p id="prediction"></p>
+  <p id="history"></p>
 
   <script>
-    let history = [2.34, 2.23, 1.22, 7.83]; // Sample starting data
-    let autoMode = false;
-    let autoInterval = null;
+    let history = JSON.parse(localStorage.getItem("aviatorHistory")) || [];
 
-    function simulateRound() {
-      const next = Math.random() * 10;
-      history.push(parseFloat(next.toFixed(2)));
-      updateUI(next);
+    function saveHistory() {
+      localStorage.setItem("aviatorHistory", JSON.stringify(history));
     }
 
-    function getCrashRisk(history) {
-      const recent = history.slice(-5);
-      const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
-      if (avg < 2.0) return "High";
-      if (avg < 3.0) return "Medium";
-      return "Low";
+    function clearHistory() {
+      history = [];
+      saveHistory();
+      document.getElementById("prediction").innerHTML = "";
+      document.getElementById("history").innerHTML = "History cleared.";
     }
 
-    function isPinkRoundLikely(history) {
-      const recent = history.slice(-5);
-      const lowRounds = recent.filter(r => r <= 2.0).length;
-      const lastPinkIndex = history.findLastIndex(r => r >= 7.0);
-      const pinkCooldown = lastPinkIndex === -1 ? history.length : history.length - lastPinkIndex;
-      return lowRounds >= 3 && pinkCooldown >= 10;
+    function predictNext() {
+      const input = parseFloat(document.getElementById("crashInput").value);
+      const mode = document.getElementById("mode").value;
+      if (isNaN(input)) return alert("Please enter a valid number");
+
+      history.push(input);
+      if (history.length > 50) history.shift(); // keep last 50
+      saveHistory();
+
+      let risk = input < 1.5 ? "⚠️ High Crash Risk" : "";
+      let pink = detectPinkRound() ? "💗 Pink Round Possible" : "";
+
+      let nextPrediction = estimateNextCrash(mode);
+
+      let modeLabel = mode === "safe" ? "🛡️ Safe Mode" :
+                      mode === "risky" ? "🔥 Risky Mode" : "💗 Pink Hunter";
+
+      document.getElementById("prediction").innerHTML = `
+        Mode: <span class="${mode}">${modeLabel}</span><br>
+        Predicted Crash: <strong>${nextPrediction.toFixed(2)}x</strong><br>
+        <span class="risk">${risk}</span> <span class="pink">${pink}</span>
+      `;
+
+      document.getElementById("history").innerHTML = `
+        Last 5 Crashes: ${history.slice(-5).map(v => v.toFixed(2)).join(", ")}
+      `;
     }
 
-    function getStrategyMode(history) {
+    function estimateNextCrash(mode) {
+      let recent = history.slice(-5);
+      let avg = recent.reduce((a, b) => a + b, 0) / recent.length;
+      let volatility = Math.max(...recent) - Math.min(...recent);
+
+      let adjustment = 0;
+      if (mode === "safe") {
+        adjustment = volatility > 2 ? -0.7 : -0.3;
+      } else if (mode === "risky") {
+        adjustment = volatility > 2 ? 0.8 : 0.4;
+      } else if (mode === "pink") {
+        adjustment = detectPinkRound() ? 2.5 : 0.5;
+      }
+
+      return Math.max(1.01, avg + adjustment);
+    }
+
+    function detectPinkRound() {
+      let last = history.slice(-3);
+      return last.every(v => v > 10);
+    }
+  </script>
+</body>
+</html>
