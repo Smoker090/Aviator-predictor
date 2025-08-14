@@ -1,4 +1,10 @@
-<script>
+<input type="text" id="crashInput" placeholder="Enter last crash value" />
+<select id="riskMode">
+  <option value="safe">Safe</option>
+  <option value="aggressive">Aggressive</option>
+</select>
+<button onclick="predictNext()">Predict Next</button>
+<div id="result"></div><script>
 let history = [];
 let predictions = [];
 let pinkCounter = 0;
