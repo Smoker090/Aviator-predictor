@@ -3,43 +3,125 @@
 <head>
   <meta charset="UTF-8">
   <title>Aviator Predictor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
   <style>
-    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
-    input, button { padding: 10px; margin: 10px 0; width: 100%; }
-    #output { margin-top: 20px; font-size: 18px; background: #fff; padding: 10px; border-radius: 5px; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0d0d0d; color: #f2f2f2; margin: 0; padding: 20px; text-align: center; }
+    input, select, button { padding: 12px; margin: 10px 0; width: 90%; max-width: 400px; font-size: 16px; border-radius: 8px; border: none; }
+    button { background: #ff0055; color: white; font-weight: bold; }
+    .log, .tracker { background: #1a1a1a; padding: 15px; border-radius: 10px; margin-top: 20px; }
+    .green { color: #00ff99; }
+    .blue { color: #00bfff; }
+    .pink { color: #ff69b4; }
+    .header { font-size: 24px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
-  <h2>Aviator Predictor</h2>
-  <input id="roundsInput" placeholder="Enter last 10 crash values (e.g. 1.00, 2.00, 10.00)">
+  <h1>🎯 Aviator History Predictor</h1>
+  <p>Enter last 10 crash values (e.g. 1.00, 2.50, 10.00...)</p>
+  <input id="roundsInput" placeholder="Comma-separated crash values">
+  <select id="mode">
+    <option value="adaptive">🎛 Adaptive Mode</option>
+    <option value="safe">🛡 Safe Mode</option>
+    <option value="aggressive">🔥 Aggressive Mode</option>
+  </select>
   <button onclick="predictNext()">Predict Next Round</button>
-  <div id="output"></div>
+
+  <div class="tracker" id="pinkTracker"></div>
+  <div class="log" id="output"></div>
 
   <script>
+    let history = [];
+    let pinkCountdown = 0;
+
     function predictNext() {
       const input = document.getElementById('roundsInput').value;
+      const mode = document.getElementById('mode').value;
       const rounds = input.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
       if (rounds.length < 5) {
         document.getElementById('output').innerText = "Please enter at least 5 valid crash values.";
         return;
       }
 
-      const blues = rounds.filter(r => r < 2).length;
+      const blues = rounds.filter(r => r <= 1.50).length;
       const pinks = rounds.filter(r => r >= 10).length;
+      const avg = rounds.reduce((a, b) => a + b, 0) / rounds.length;
 
-      let riskLevel = "Medium";
-      if (blues >= 3) riskLevel = "High";
-      else if (pinks >= 2) riskLevel = "Low";
+      let risk = "Medium";
+      if (blues >= 4) risk = "High";
+      else if (pinks >= 2 || avg >= 4.5) risk = "Low";
 
-      let predicted;
-      if (riskLevel === "High") predicted = +(Math.random() * 1.5).toFixed(2);
-      else if (riskLevel === "Low") predicted = +(Math.random() * 10 + 2).toFixed(2);
-      else predicted = +(Math.random() * 3 + 1).toFixed(2);
+      let base = mode === "safe" ? 1.2 : mode === "aggressive" ? 8 : risk === "High" ? 1.5 : risk === "Low" ? 10 : 3;
+      let predicted = Math.random() * base;
+      predicted = Math.round(predicted * 100) / 100;
+
+      const lastRound = rounds[rounds.length - 1];
+      const success = lastRound >= predicted;
+
+      history.push({ prediction: predicted, result: lastRound, success });
+      localStorage.setItem("aviatorHistory", JSON.stringify(history));
+
+      pinkCountdown = pinks >= 1 ? 5 : pinkCountdown > 0 ? pinkCountdown - 1 : 0;
+
+      document.getElementById('pinkTracker').innerHTML = `
+        <h2>🌸 Pink Round Tracker</h2>
+        <p>${pinkCountdown > 0 ? `Pink round expected in ${pinkCountdown} rounds` : "No pink round expected soon."}</p>
+      `;
 
       document.getElementById('output').innerHTML = `
-        <strong>Predicted Crash:</strong> ${predicted}x<br>
-        <strong>Risk Level:</strong> ${riskLevel}
+        <h2 class="header">📊 Prediction Result</h2>
+        <p>Mode: <strong>${mode.charAt(0).toUpperCase() + mode.slice(1)}</strong></p>
+        <p>Next crash predicted: <strong>${predicted}x</strong></p>
+        <p>Risk Level: <strong>${risk}</strong></p>
+        <p>Advice: ${
+          risk === "High" ? "🛑 Stop betting — blue risk!" :
+          risk === "Low" ? "🎯 Hunt pink — high chance!" :
+          "🟡 Moderate risk — bet cautiously"
+        }</p>
+        <p>Last round was ${lastRound}x — ${
+          success ? "<span class='green'>✅ Predicted successfully</span>" : "<span class='blue'>❌ Missed</span>"
+        }</p>
+        <h3>📜 Prediction History</h3>
+        ${history.slice(-5).map(h => `
+          <p>${h.prediction}x → ${h.result}x ${h.success ? "✅" : "❌"}</p>
+        `).join('')}
       `;
+    }
+
+    window.onload = () => {
+      const saved = localStorage.getItem("aviatorHistory");
+      if (saved) history = JSON.parse(saved);
+    };
+
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log("SW failed:", err));
+    }
+  </script>
+
+  <!-- Embedded manifest -->
+  <script type="application/json" id="manifest">
+  {
+    "name": "Aviator Predictor",
+    "short_name": "Predictor",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#0d0d0d",
+    "theme_color": "#ff0055",
+    "icons": [{
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }]
+  }
+  </script>
+
+  <!-- Embedded service worker -->
+  <script>
+    const swBlob = new Blob(["self.addEventListener('fetch', () => {});"], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(swBlob);
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register(swUrl);
     }
   </script>
 </body>
