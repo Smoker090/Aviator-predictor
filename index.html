@@ -2,49 +2,118 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Aviator 2-Round Predictor</title>
+  <title>Aviator Predictor Bot</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #0d0d0d;
-      color: #f2f2f2;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-    .container {
-      max-width: 400px;
-      margin: auto;
-    }
-    input, button {
-      padding: 12px;
-      margin: 10px 0;
-      width: 100%;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-    }
-    button {
-      background: #ff0055;
-      color: white;
-      font-weight: bold;
-    }
-    .prediction {
-      font-size: 24px;
-      margin-top: 20px;
-    }
-    .log {
-      background: #1a1a1a;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 20px;
-      text-align: left;
-    }
-    .log p {
-      margin: 5px 0;
-    }
+    body { font-family: sans-serif; padding: 10px; background: #111; color: #eee; }
+    input, button, select, textarea { margin: 5px 0; padding: 8px; width: 100%; font-size: 16px; border-radius: 5px; border: none; }
+    button { background: #e91e63; color: white; font-weight: bold; }
+    .section { margin-top: 20px; border-top: 1px solid #444; padding-top: 10px; }
+    .result { background: #222; padding: 10px; margin-top: 10px; border-radius: 5px; }
+    #liveFeed div { padding: 5px; border-bottom: 1px solid #333; }
   </style>
 </head>
 <body>
-  <div class="container">
+  <h2>🎯 Aviator Predictor Bot</h2>
+
+  <label for="mode">Select Mode:</label>
+  <select id="mode" onchange="switchMode()">
+    <option value="manual">Manual Input</option>
+    <option value="seed">Seed Verification</option>
+    <option value="compare">Compare with Africabet</option>
+    <option value="live">Live Simulation</option>
+  </select>
+
+  <!-- Manual Input Mode -->
+  <div id="manualMode" class="section">
+    <h3>✍️ Manual Crash Input</h3>
+    <input type="number" id="crashInput" placeholder="Enter last crash value">
+    <button onclick="predict()">Predict Next</button>
+    <div id="manualResult" class="result"></div>
+  </div>
+
+  <!-- Seed Verification Mode -->
+  <div id="seedMode" class="section" style="display:none;">
+    <h3>🔐 Seed Verification</h3>
+    <input type="text" id="serverSeed" placeholder="Server Seed">
+    <input type="text" id="clientSeed" placeholder="Client Seed">
+    <input type="number" id="nonce" placeholder="Nonce">
+    <button onclick="verifyCrash()">Verify Crash</button>
+    <div id="seedResult" class="result"></div>
+  </div>
+
+  <!-- Africabet Comparison Mode -->
+  <div id="compareMode" class="section" style="display:none;">
+    <h3>📊 Compare with Africabet</h3>
+    <textarea id="crashHistory" rows="5" placeholder="Paste crash values from Africabet"></textarea>
+    <button onclick="compareHistory()">Compare</button>
+    <div id="compareResult" class="result"></div>
+  </div>
+
+  <!-- Live Simulation Mode -->
+  <div id="liveMode" class="section" style="display:none;">
+    <h3>📡 Live Simulation</h3>
+    <div id="liveFeed" class="result"></div>
+  </div>
+
+  <!-- CryptoJS for seed verification -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+  <script>
+    function switchMode() {
+      const mode = document.getElementById("mode").value;
+      document.getElementById("manualMode").style.display = mode === "manual" ? "block" : "none";
+      document.getElementById("seedMode").style.display = mode === "seed" ? "block" : "none";
+      document.getElementById("compareMode").style.display = mode === "compare" ? "block" : "none";
+      document.getElementById("liveMode").style.display = mode === "live" ? "block" : "none";
+    }
+
+    function getRisk(crash) {
+      crash = parseFloat(crash);
+      if (crash < 1.5) return "🔥 High Risk";
+      if (crash < 2) return "⚠️ Medium Risk";
+      if (crash > 10) return "🎀 Pink Round!";
+      return "✅ Low Risk";
+    }
+
+    function predict() {
+      const crash = parseFloat(document.getElementById("crashInput").value);
+      const risk = getRisk(crash);
+      document.getElementById("manualResult").innerHTML = `Risk Level: ${risk}`;
+    }
+
+    function verifyCrash() {
+      const serverSeed = document.getElementById("serverSeed").value;
+      const clientSeed = document.getElementById("clientSeed").value;
+      const nonce = parseInt(document.getElementById("nonce").value);
+      const hash = CryptoJS.HmacSHA256(`${clientSeed}:${nonce}`, serverSeed).toString();
+      const intVal = parseInt(hash.substring(0, 13), 16);
+      const crash = Math.floor(100 / (1 - (intVal / Math.pow(2, 52)))) / 100;
+      document.getElementById("seedResult").innerHTML = `Verified Crash: ${crash.toFixed(2)}x<br>${getRisk(crash)}`;
+    }
+
+    function compareHistory() {
+      const raw = document.getElementById("crashHistory").value;
+      const values = raw.split(/[\s,]+/).map(v => parseFloat(v)).filter(v => !isNaN(v));
+      const risky = values.filter(v => v < 1.5).length;
+      const pinks = values.filter(v => v > 10).length;
+      document.getElementById("compareResult").innerHTML = `
+        Total Rounds: ${values.length}<br>
+        🔥 High Risk (<1.5x): ${risky}<br>
+        🎀 Pink Rounds (>10x): ${pinks}
+      `;
+    }
+
+    // Live Simulation
+    setInterval(() => {
+      const mode = document.getElementById("mode").value;
+      if (mode !== "live") return;
+      const simulatedCrash = (Math.random() * 10 + 1).toFixed(2);
+      const risk = getRisk(simulatedCrash);
+      const log = document.createElement("div");
+      log.textContent = `Crash: ${simulatedCrash}x → ${risk}`;
+      document.getElementById("liveFeed").prepend(log);
+    }, 5000); // every 5 seconds
+  </script>
+</body>
+</html>
