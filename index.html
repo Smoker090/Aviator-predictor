@@ -2,84 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Aviator Predictor Bot</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQXZpYXRvciBQcmVkaWN0b3IgQm90Iiwic2hvcnRfbmFtZSI6IkF2aWF0b3JCb3QiLCJzdGFydF91cmwiOiIuL2luZGV4Lmh0bWwiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMTExIiwidGhlbWVfY29sb3IiOiIjMTExIiwiaWNvbnMiOlt7InNyYyI6Imljb24ucG5nIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
+  <title>Aviator Predictor</title>
   <style>
-    body { font-family: Arial, background: #111; color: #eee; text-align: center; padding: 20px; }
-    input, button { padding: 10px; margin: 5px; font-size: 16px; width: 90%; max-width: 400px; }
-    .log { margin-top: 20px; background: #222; padding: 10px; border-radius: 8px; }
-    .pink { color: #ff69b4; }
-    .blue { color: #00bfff; }
-    .green { color: #00ff99; }
+    body { font-family: Arial; padding: 20px; background: #f4f4f4; }
+    input, button { padding: 10px; margin: 10px 0; width: 100%; }
+    #output { margin-top: 20px; font-size: 18px; background: #fff; padding: 10px; border-radius: 5px; }
   </style>
 </head>
 <body>
-  <h1>🚀 Aviator Predictor Bot</h1>
-  <p>Enter last 10 crash values (e.g. 1.23, 2.5, 10.1...)</p>
-  <input id="roundsInput" placeholder="Comma-separated values">
-  <button onclick="runPrediction()">Predict Next</button>
-
-  <h3>🔐 Verify Crash with Server Seed</h3>
-  <input id="seedInput" placeholder="Enter revealed serverSeed">
-  <input id="nonceInput" placeholder="Enter nonce (default 0)">
-  <button onclick="verifyCrash()">Verify Crash</button>
-
-  <div class="log" id="output"></div>
-  <div class="log" id="verifyLog"></div>
+  <h2>Aviator Predictor</h2>
+  <input id="roundsInput" placeholder="Enter last 10 crash values (e.g. 1.00, 2.00, 10.00)">
+  <button onclick="predictNext()">Predict Next Round</button>
+  <div id="output"></div>
 
   <script>
-    let history = [];
-
-    function runPrediction() {
+    function predictNext() {
       const input = document.getElementById('roundsInput').value;
       const rounds = input.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
-      if (rounds.length < 5) return alert("Enter at least 5 valid rounds");
+      if (rounds.length < 5) {
+        document.getElementById('output').innerText = "Please enter at least 5 valid crash values.";
+        return;
+      }
 
-      const pinks = rounds.filter(r => r >= 10);
-      const blues = rounds.filter(r => r < 2);
-      const avg = rounds.reduce((a, b) => a + b, 0) / rounds.length;
+      const blues = rounds.filter(r => r < 2).length;
+      const pinks = rounds.filter(r => r >= 10).length;
 
-      let risk = "Medium";
-      if (blues.length >= 3) risk = "High";
-      if (pinks.length >= 2) risk = "Low";
+      let riskLevel = "Medium";
+      if (blues >= 3) riskLevel = "High";
+      else if (pinks >= 2) riskLevel = "Low";
 
-      let nextPrediction = Math.random() * (risk === "High" ? 1.5 : risk === "Low" ? 10 : 3);
-      nextPrediction = Math.round(nextPrediction * 100) / 100;
-
-      const advice = risk === "High" ? "🛑 Stop betting — blue risk!" :
-                     risk === "Low" ? "🎯 Hunt pink — high chance!" :
-                     "🟡 Moderate risk — bet cautiously";
-
-      const lastRound = rounds[rounds.length - 1];
-      const success = lastRound >= nextPrediction;
-
-      history.push({ prediction: nextPrediction, result: lastRound, success });
+      let predicted;
+      if (riskLevel === "High") predicted = +(Math.random() * 1.5).toFixed(2);
+      else if (riskLevel === "Low") predicted = +(Math.random() * 10 + 2).toFixed(2);
+      else predicted = +(Math.random() * 3 + 1).toFixed(2);
 
       document.getElementById('output').innerHTML = `
-        <h2>📊 Prediction Result</h2>
-        <p>Next crash predicted: <strong>${nextPrediction}x</strong></p>
-        <p>Risk Level: <strong>${risk}</strong></p>
-        <p>Advice: ${advice}</p>
-        <p>Last round was ${lastRound}x — ${
-          success ? "<span class='green'>✅ Predicted successfully</span>" : "<span class='blue'>❌ Missed</span>"
-        }</p>
-        <h3>📜 Prediction History</h3>
-        ${history.slice(-5).map(h => `
-          <p>${h.prediction}x → ${h.result}x ${h.success ? "✅" : "❌"}</p>
-        `).join('')}
+        <strong>Predicted Crash:</strong> ${predicted}x<br>
+        <strong>Risk Level:</strong> ${riskLevel}
       `;
     }
-
-    function verifyCrash() {
-      const seed = document.getElementById('seedInput').value.trim();
-      const nonce = parseInt(document.getElementById('nonceInput').value.trim()) || 0;
-      if (!seed) return alert("Enter a valid serverSeed");
-
-      const crypto = window.crypto || window.msCrypto;
-      const text = seed + ":" + nonce;
-      const encoder = new TextEncoder();
-      const data = encoder.encode(text);
-
-      crypto.subtle.digest("SHA-256", data).then(hashBuffer => {
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
+  </script>
+</body>
+</html>
