@@ -1,153 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>CrashSense Aviator Predictor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <title>Aviator Predictor Bot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQXZpYXRvciBQcmVkaWN0b3IgQm90Iiwic2hvcnRfbmFtZSI6IkF2aWF0b3JCb3QiLCJzdGFydF91cmwiOiIuL2luZGV4Lmh0bWwiLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMTExIiwidGhlbWVfY29sb3IiOiIjMTExIiwiaWNvbnMiOlt7InNyYyI6Imljb24ucG5nIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
-    input, button { font-size: 16px; padding: 10px; width: 100%; margin-bottom: 10px; }
-    .entry { border-bottom: 1px solid #ccc; padding: 5px 0; }
-    .high { background: #c8f7c5; }
-    .low { background: #f7c5c5; }
-    .medium { background: #f0f0f0; }
-    canvas { max-width: 100%; margin-top: 20px; }
+    body { font-family: Arial, background: #111; color: #eee; text-align: center; padding: 20px; }
+    input, button { padding: 10px; margin: 5px; font-size: 16px; width: 90%; max-width: 400px; }
+    .log { margin-top: 20px; background: #222; padding: 10px; border-radius: 8px; }
+    .pink { color: #ff69b4; }
+    .blue { color: #00bfff; }
+    .green { color: #00ff99; }
   </style>
 </head>
 <body>
-  <h2>🚀 CrashSense Aviator Predictor</h2>
+  <h1>🚀 Aviator Predictor Bot</h1>
+  <p>Enter last 10 crash values (e.g. 1.23, 2.5, 10.1...)</p>
+  <input id="roundsInput" placeholder="Comma-separated values">
+  <button onclick="runPrediction()">Predict Next</button>
 
-  <label>Server Seed (from Africabet):</label>
-  <input type="text" id="serverSeed" placeholder="Paste revealed seed">
+  <h3>🔐 Verify Crash with Server Seed</h3>
+  <input id="seedInput" placeholder="Enter revealed serverSeed">
+  <input id="nonceInput" placeholder="Enter nonce (default 0)">
+  <button onclick="verifyCrash()">Verify Crash</button>
 
-  <label>Client Seed:</label>
-  <input type="text" id="clientSeed" value="PolitePredictor">
-
-  <label>Nonce (Round Number):</label>
-  <input type="number" id="nonce" placeholder="e.g. 123456">
-
-  <button onclick="verifyAndTrain()">Verify & Train</button>
-  <div id="result" style="margin-top:10px; font-weight:bold;"></div>
-
-  <h3>📊 Crash History</h3>
-  <div id="history"></div>
-
-  <h3>🧠 CrashSense Prediction</h3>
-  <div id="prediction"></div>
-
-  <canvas id="crashChart" height="200"></canvas>
+  <div class="log" id="output"></div>
+  <div class="log" id="verifyLog"></div>
 
   <script>
-    let recentRounds = [];
+    let history = [];
 
-    function verifyAndTrain() {
-      const serverSeed = document.getElementById("serverSeed").value.trim();
-      const clientSeed = document.getElementById("clientSeed").value.trim();
-      const nonce = parseInt(document.getElementById("nonce").value);
+    function runPrediction() {
+      const input = document.getElementById('roundsInput').value;
+      const rounds = input.split(',').map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
+      if (rounds.length < 5) return alert("Enter at least 5 valid rounds");
 
-      const input = `${serverSeed}:${clientSeed}:${nonce}`;
-      const hash = CryptoJS.SHA256(input).toString();
-      const crash = getCrashMultiplier(hash);
+      const pinks = rounds.filter(r => r >= 10);
+      const blues = rounds.filter(r => r < 2);
+      const avg = rounds.reduce((a, b) => a + b, 0) / rounds.length;
 
-      document.getElementById("result").innerText = `Crash Multiplier: ${crash}x`;
+      let risk = "Medium";
+      if (blues.length >= 3) risk = "High";
+      if (pinks.length >= 2) risk = "Low";
 
-      saveToHistory(serverSeed, clientSeed, nonce, crash);
-      updateHistoryDisplay();
-      updateCrashSense(crash);
-      updateChart();
-    }
+      let nextPrediction = Math.random() * (risk === "High" ? 1.5 : risk === "Low" ? 10 : 3);
+      nextPrediction = Math.round(nextPrediction * 100) / 100;
 
-    function getCrashMultiplier(hash) {
-      const h = parseInt(hash.slice(0, 13), 16);
-      if (h % 33 === 0) return 1.00;
-      return Math.floor((100 * (2 ** 32 - 1) / (2 ** 32 - h)) * 100) / 100;
-    }
+      const advice = risk === "High" ? "🛑 Stop betting — blue risk!" :
+                     risk === "Low" ? "🎯 Hunt pink — high chance!" :
+                     "🟡 Moderate risk — bet cautiously";
 
-    function saveToHistory(serverSeed, clientSeed, nonce, crash) {
-      const entry = { serverSeed, clientSeed, nonce, crash };
-      const history = JSON.parse(localStorage.getItem("crashHistory") || "[]");
-      history.unshift(entry);
-      localStorage.setItem("crashHistory", JSON.stringify(history.slice(0, 20)));
-    }
+      const lastRound = rounds[rounds.length - 1];
+      const success = lastRound >= nextPrediction;
 
-    function updateHistoryDisplay() {
-      const history = JSON.parse(localStorage.getItem("crashHistory") || "[]");
-      const container = document.getElementById("history");
-      container.innerHTML = "";
-      history.forEach(entry => {
-        const colorClass = entry.crash >= 10 ? "high" : entry.crash <= 1.5 ? "low" : "medium";
-        container.innerHTML += `<div class="entry ${colorClass}">
-          <strong>${entry.crash}x</strong> — Nonce: ${entry.nonce}
-        </div>`;
-      });
-    }
+      history.push({ prediction: nextPrediction, result: lastRound, success });
 
-    function updateCrashSense(newCrash) {
-      recentRounds.unshift(newCrash);
-      if (recentRounds.length > 20) recentRounds.pop();
-
-      const risk = detectCrashRisk(recentRounds);
-      const pink = detectPinkRound(recentRounds);
-      const confidence = calculateConfidence(risk, pink);
-
-      const alert = risk === "High" ? "⚠️ Avoid early jumps!" :
-                    pink === "Likely" ? "🎯 Stay longer — pink round possible!" : "";
-
-      document.getElementById("prediction").innerHTML = `
-        🔴 Risk Level: <strong>${risk}</strong><br>
-        🌸 Pink Round Chance: <strong>${pink}</strong><br>
-        📈 Confidence Score: <strong>${confidence}%</strong><br>
-        <div style="margin-top:10px; color:#d00;">${alert}</div>
+      document.getElementById('output').innerHTML = `
+        <h2>📊 Prediction Result</h2>
+        <p>Next crash predicted: <strong>${nextPrediction}x</strong></p>
+        <p>Risk Level: <strong>${risk}</strong></p>
+        <p>Advice: ${advice}</p>
+        <p>Last round was ${lastRound}x — ${
+          success ? "<span class='green'>✅ Predicted successfully</span>" : "<span class='blue'>❌ Missed</span>"
+        }</p>
+        <h3>📜 Prediction History</h3>
+        ${history.slice(-5).map(h => `
+          <p>${h.prediction}x → ${h.result}x ${h.success ? "✅" : "❌"}</p>
+        `).join('')}
       `;
     }
 
-    function detectCrashRisk(rounds) {
-      const lowCrashes = rounds.filter(r => r <= 1.5).length;
-      return lowCrashes >= 5 ? "High" : lowCrashes >= 3 ? "Medium" : "Low";
-    }
+    function verifyCrash() {
+      const seed = document.getElementById('seedInput').value.trim();
+      const nonce = parseInt(document.getElementById('nonceInput').value.trim()) || 0;
+      if (!seed) return alert("Enter a valid serverSeed");
 
-    function detectPinkRound(rounds) {
-      const highCrashes = rounds.filter(r => r >= 10).length;
-      return highCrashes >= 2 ? "Likely" : "Unlikely";
-    }
+      const crypto = window.crypto || window.msCrypto;
+      const text = seed + ":" + nonce;
+      const encoder = new TextEncoder();
+      const data = encoder.encode(text);
 
-    function calculateConfidence(risk, pink) {
-      if (risk === "High") return 90;
-      if (pink === "Likely") return 80;
-      return 50;
-    }
-
-    function updateChart() {
-      const history = JSON.parse(localStorage.getItem("crashHistory") || "[]");
-      const labels = history.map((e, i) => `#${e.nonce || i + 1}`);
-      const data = history.map(e => e.crash);
-
-      const ctx = document.getElementById("crashChart").getContext("2d");
-      if (window.crashChart) window.crashChart.destroy();
-      window.crashChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [{
-            label: 'Crash Multiplier',
-            data: data,
-            borderColor: '#0077cc',
-            backgroundColor: 'rgba(0,119,204,0.2)',
-            fill: true,
-            tension: 0.3
-          }]
-        },
-        options: {
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
-    }
-
-    updateHistoryDisplay();
-    updateChart();
-  </script>
-</body>
-</html>
+      crypto.subtle.digest("SHA-256", data).then(hashBuffer => {
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
