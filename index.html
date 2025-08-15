@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Aviator Predictor Lite</title>
+  <title>Aviator Predictor Pro+</title>
   <style>
     body { font-family: Arial, sans-serif; background: #111; color: #eee; padding: 20px; }
     h1 { color: #ff004f; }
@@ -13,16 +13,16 @@
       border-radius: 5px; border: none;
     }
     button { background: #ff004f; color: white; cursor: pointer; }
-    .result { background: #222; padding: 10px; border-radius: 5px; }
-    .green { color: #00ff99; } .red { color: #ff4444; } .pink { color: #ff69b4; }
+    .result { background: #222; padding: 10px; border-radius: 5px; margin-top: 10px; }
+    .green { color: #00ff99; } .red { color: #ff4444; } .pink { color: #ff69b4; } .yellow { color: #ffff66; }
   </style>
 </head>
 <body>
-  <h1>✈️ Aviator Predictor Lite</h1>
+  <h1>✈️ Aviator Predictor Pro+</h1>
 
   <div class="section">
-    <h2>📥 Enter Last 5 Crash Values</h2>
-    <textarea id="crashInput" rows="3" placeholder="e.g. 1.23, 2.01, 1.01, 100.00, 2.50"></textarea>
+    <h2>📥 Enter Last 10 Crash Values</h2>
+    <textarea id="crashInput" rows="3" placeholder="e.g. 1.23, 2.01, 1.01, 100.00, 2.50, ..."></textarea>
     <select id="mode">
       <option value="safe">Safe</option>
       <option value="adaptive" selected>Adaptive</option>
@@ -30,6 +30,8 @@
     </select>
     <button onclick="predictNext()">Predict Next Round</button>
     <div id="prediction" class="result"></div>
+    <div id="tracker" class="result"></div>
+    <div id="countdown" class="result"></div>
   </div>
 
   <div class="section">
@@ -40,6 +42,8 @@
   </div>
 
   <script>
+    let pinkETA = null;
+
     function parseCrashValues() {
       const input = document.getElementById("crashInput").value;
       return input.split(",").map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
@@ -54,6 +58,7 @@
       const last = values[values.length - 1];
       let next = 1.0, risk = "Unknown";
 
+      // Prediction logic
       if (mode === "safe") {
         next = last < 2 ? 1.5 : 2.0;
         risk = last < 1.2 ? "High" : "Low";
@@ -65,9 +70,54 @@
         risk = avg < 1.5 ? "High" : avg > 5 ? "Low" : "Medium";
       }
 
+      // Pink round tracker
+      const pinks = values.filter(v => v > 10);
+      const lastPinkIndex = values.lastIndexOf(pinks[pinks.length - 1]);
+      const roundsSincePink = values.length - lastPinkIndex - 1;
+      const pinkDue = roundsSincePink >= 20 ? "🎀 Pink round likely soon!" : `Last pink was ${roundsSincePink} rounds ago`;
+
+      // Cooldown detector
+      const lowStreak = values.slice(-5).filter(v => v < 1.5).length;
+      const cooldown = lowStreak >= 3 ? "⚠️ Cooldown detected — play cautiously" : "✅ No cooldown streak";
+
+      // Pink ETA
+      const pinkCountdown = estimatePinkTime(values);
+
+      // Display
       document.getElementById("prediction").innerHTML =
-        `Next Multiplier: <span class="green">${next.toFixed(2)}x</span><br>Risk Level: <span class="${risk === 'High' ? 'red' : risk === 'Low' ? 'green' : 'pink'}">${risk}</span>`;
+        `Next Multiplier: <span class="green">${next.toFixed(2)}x</span><br>Risk Level: <span class="${risk === 'High' ? 'red' : risk === 'Low' ? 'green' : 'yellow'}">${risk}</span>`;
+
+      document.getElementById("tracker").innerHTML =
+        `<span class="pink">${pinkDue}</span><br><span class="${lowStreak >= 3 ? 'red' : 'green'}">${cooldown}</span><br><span class="pink">${pinkCountdown}</span>`;
     }
+
+    function estimatePinkTime(values) {
+      const pinks = values.filter(v => v > 10);
+      if (pinks.length < 2) return "Not enough pinks to estimate";
+
+      const lastPinkIndex = values.lastIndexOf(pinks[pinks.length - 1]);
+      const spacing = Math.round(values.length / pinks.length);
+      const roundsSince = values.length - lastPinkIndex - 1;
+      const roundsUntilNext = spacing - roundsSince;
+      const secondsUntilNext = roundsUntilNext * 15;
+
+      const now = new Date();
+      pinkETA = new Date(now.getTime() + secondsUntilNext * 1000);
+      return `🎯 Catch pink at ${pinkETA.toLocaleTimeString()} (${roundsUntilNext} rounds away)`;
+    }
+
+    function updateCountdown() {
+      if (!pinkETA) return;
+      const now = new Date();
+      const diff = Math.max(0, Math.floor((pinkETA - now) / 1000));
+      const mins = Math.floor(diff / 60);
+      const secs = diff % 60;
+      const formatted = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      document.getElementById("countdown").innerHTML =
+        `⏳ Countdown: <span class="yellow">${formatted} remaining</span>`;
+    }
+
+    setInterval(updateCountdown, 1000);
 
     function simulateStrategy() {
       const target = parseFloat(document.getElementById("cashoutTarget").value);
