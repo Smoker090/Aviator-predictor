@@ -56,16 +56,9 @@
 
   <div class="section">
     <h2>📈 Bet Tracker</h2>
-    <textarea id="betLog" rows="4" placeholder="Paste your bets and outcomes here..."></textarea>
+    <textarea id="betLog" rows="4" placeholder="Paste your bets and outcomes here (e.g. 1.00,1.50)"></textarea>
     <button onclick="analyzeBets()">Analyze Bets</button>
     <div id="betStats" class="result"></div>
-  </div>
-
-  <div class="section">
-    <h2>📡 Telegram Alerts</h2>
-    <input id="telegramKey" placeholder="Your Telegram Bot API Key" />
-    <button onclick="sendTelegramAlert()">Send Test Alert</button>
-    <div id="telegramStatus" class="result"></div>
   </div>
 
   <div class="section">
@@ -163,4 +156,13 @@
         }
       });
       const roi = ((total - log.length) / log.length) * 100;
-     [43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/Ronnie434/30-days-of-React/tree/22142106cb46f717a1259f84227cc90ed7fe50cc/02_Day_Introduction_to_React%2F02_introduction_to_react.md?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "1")
+      document.getElementById("betStats").innerHTML =
+        `Win Rate: ${wins} / ${log.length}<br>ROI: <span class="green">${roi.toFixed(2)}%</span>`;
+    }
+
+    function recommendStrategy() {
+      const values = parseCrashValues();
+      if (values.length < 5) return alert("Paste at least 5 crash values");
+      const avg = values.reduce((a,b) => a+b, 0) / values.length;
+      let advice = "Adaptive mode is recommended.";
+[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/Ronnie434/30-days-of-React/tree/22142106cb46f717a1259f84227cc90ed7fe50cc/02_Day_Introduction_to_React%2F02_introduction_to_react.md?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "1")
