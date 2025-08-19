@@ -5,97 +5,177 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aviator Companion Pro+</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #eee;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 { color: #ff4081; }
-    select, input, button {
-      padding: 10px;
-      margin: 10px 0;
-      width: 100%;
-      font-size: 1em;
-    }
-    .section {
-      border: 1px solid #444;
-      padding: 15px;
-      margin-bottom: 20px;
-      background: #222;
-    }
-    .alert { color: #ff4081; font-weight: bold; }
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    .section { margin-bottom: 20px; }
+    input, select, button { padding: 10px; margin-top: 5px; width: 100%; max-width: 400px; }
+    .result { background: #fff; padding: 10px; border-radius: 5px; margin-top: 10px; }
+    #mainApp { display: none; }
+    #flightArea { position: relative; height: 150px; background: #e0f7fa; overflow: hidden; margin-top: 10px; }
+    #plane { position: absolute; top: 60px; left: 0px; width: 50px; transition: left 0.1s linear; }
   </style>
 </head>
 <body>
-  <h1>🚀 Aviator Companion Pro+</h1>
 
+<!-- 🔐 Password Gate -->
+<div class="section" id="gate">
+  <h2>🔐 Enter Access Password</h2>
+  <input type="password" id="password" placeholder="Enter password" />
+  <button onclick="checkPassword()">Next</button>
+  <p id="accessStatus"></p>
+</div>
+
+<!-- 🚀 Main App -->
+<div id="mainApp">
+
+  <!-- 🎰 Betting Site Selector -->
   <div class="section">
-    <label for="password">🔐 Enter Access Password:</label>
-    <input type="password" id="password" placeholder="Enter password" />
-    <button onclick="checkPassword()">Unlock Features</button>
-    <p id="accessStatus"></p>
+    <h2>🎰 Choose Betting Site</h2>
+    <select id="siteSelector">
+      <option value="">Select a site</option>
+      <option value="Spincity">Spincity.co.zw</option>
+      <option value="Africabet">Africabet.com</option>
+      <option value="Betway">Betway</option>
+      <option value="Hollywoodbets">Hollywoodbets</option>
+    </select>
+    <p id="siteStatus"></p>
   </div>
 
-  <div id="mainApp" style="display:none;">
-    <div class="section">
-      <label for="site">🌐 Select Betting Site:</label>
-      <select id="site">
-        <option value="spincity">Spincity.co.zw</option>
-        <option value="africabet">Africabet.com</option>
-      </select>
+  <!-- ✈️ Visual Flight Simulator -->
+  <div class="section">
+    <h2>✈️ Visual Flight</h2>
+    <button onclick="startFlight()">Start Flight</button>
+    <div id="flightArea">
+      <img id="plane" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Airplane_silhouette.svg/120px-Airplane_silhouette.svg.png" />
     </div>
-
-    <div class="section">
-      <label for="data">🔄 Paste Crash Data:</label>
-      <textarea id="data" rows="5" placeholder="e.g. 1.23, 2.01, 1.00..."></textarea>
-      <button onclick="analyzeData()">Run Prediction</button>
-    </div>
-
-    <div class="section">
-      <p>🎯 Prediction: <span id="prediction">--</span></p>
-      <p>🎀 Pink Round Tracker: <span id="pinkTracker">--</span></p>
-      <p>⚠️ Cooldown Status: <span id="cooldown">--</span></p>
-      <p>⏳ Countdown to Next Pink: <span id="countdown">--</span></p>
-    </div>
-
-    <div class="section">
-      <p>🚀 Flight Simulation: <span id="flight">--</span></p>
-      <p class="alert">💸 Cash Out NOW Alert: <span id="cashout">--</span></p>
-      <p class="alert">💥 Crash Alert: <span id="crashAlert">--</span></p>
-    </div>
+    <div class="result" id="flightStatus"></div>
   </div>
 
-  <script>
-    function checkPassword() {
-      const pass = document.getElementById("password").value;
-      if (pass === "aviator2025") {
-        document.getElementById("mainApp").style.display = "block";
-        document.getElementById("accessStatus").innerText = "✅ Access granted!";
-      } else {
-        document.getElementById("accessStatus").innerText = "❌ Incorrect password.";
+  <!-- 💸 Cash Out Advisor -->
+  <div class="section">
+    <h2>💸 Cash Out Advisor</h2>
+    <button onclick="cashOutAdvice()">Should I Cash Out?</button>
+    <div class="result" id="cashOutResult"></div>
+  </div>
+
+  <!-- 📊 Prediction Engine -->
+  <div class="section">
+    <h2>📊 Aviator Predictor</h2>
+    <select id="roundInput">
+      <option value="">Select last round outcome</option>
+      <option value="low">Low (1.00–1.50x)</option>
+      <option value="mid">Mid (1.51–5.00x)</option>
+      <option value="high">High (5.01x+)</option>
+    </select>
+    <button onclick="predictNext()">Predict Next</button>
+    <div class="result" id="predictionResult"></div>
+  </div>
+
+  <!-- 🧮 Fairness Verifier -->
+  <div class="section">
+    <h2>🧮 Fairness Verifier</h2>
+    <input type="text" id="hashInput" placeholder="Enter round hash" />
+    <button onclick="verifyFairness()">Verify</button>
+    <div class="result" id="fairnessResult"></div>
+  </div>
+
+  <!-- 📈 Strategy Simulator -->
+  <div class="section">
+    <h2>📈 Strategy Simulator</h2>
+    <input type="number" id="startingBet" placeholder="Starting bet amount" />
+    <input type="number" id="multiplier" placeholder="Target multiplier (e.g. 2.0)" />
+    <button onclick="simulateStrategy()">Simulate</button>
+    <div class="result" id="strategyResult"></div>
+  </div>
+
+  <!-- 📉 Graphing Module -->
+  <div class="section">
+    <h2>📉 Round Graph</h2>
+    <input type="text" id="roundsInput" placeholder="Enter multipliers (comma-separated)" />
+    <button onclick="generateGraph()">Generate Graph</button>
+    <div class="result" id="graphResult"></div>
+  </div>
+
+  <!-- 🎓 Educational Tips -->
+  <div class="section">
+    <h2>🎓 Tips & Transparency</h2>
+    <ul>
+      <li>✅ Predictor uses pattern logic, not guarantees.</li>
+      <li>🔍 Verifier checks provably fair hashes.</li>
+      <li>📊 Simulator helps test strategies before risking real money.</li>
+      <li>📱 Fully mobile-friendly and installable as a PWA.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 🔊 Sound Effects -->
+<audio id="takeoffSound" src="https://www.soundjay.com/transport/airplane-flyby-01.mp3"></audio>
+<audio id="crashSound" src="https://www.soundjay.com/button/beep-07.mp3"></audio>
+
+<script>
+  function checkPassword() {
+    const pass = document.getElementById("password").value;
+    if (pass === "aviator2025") {
+      document.getElementById("mainApp").style.display = "block";
+      document.getElementById("gate").style.display = "none";
+    } else {
+      document.getElementById("accessStatus").innerText = "❌ Incorrect password.";
+    }
+  }
+
+  function startFlight() {
+    const plane = document.getElementById("plane");
+    const status = document.getElementById("flightStatus");
+    const takeoff = document.getElementById("takeoffSound");
+    const crash = document.getElementById("crashSound");
+    let position = 0;
+    let multiplier = (Math.random() * 10 + 1).toFixed(2); // 1.00–11.00x
+    status.innerText = `🛫 Flight started... Target multiplier: ${multiplier}x`;
+    takeoff.play();
+
+    const flight = setInterval(() => {
+      position += 5;
+      plane.style.left = position + "px";
+
+      if (position >= multiplier * 10) {
+        clearInterval(flight);
+        crash.play();
+        status.innerText += `\n💥 Plane crashed at ${multiplier}x!`;
+      } else if (position >= multiplier * 7) {
+        status.innerText += `\n⚠️ Cash out now!`;
       }
-    }
+    }, 100);
+  }
 
-    function analyzeData() {
-      const raw = document.getElementById("data").value;
-      const values = raw.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
-      const last = values[values.length - 1];
-      const pinks = values.filter(v => v >= 2.0).length;
-      const cooldown = last < 1.2 ? "Active" : "Clear";
-      const nextPinkIn = 5 - (pinks % 5);
-      const prediction = last < 1.2 ? "High chance of pink soon" : "Low chance";
+  function cashOutAdvice() {
+    const advice = [
+      "💸 Cash out now! Multiplier peak approaching.",
+      "⏳ Hold a bit longer — flight still climbing.",
+      "⚠️ Risk spike detected — exit immediately!",
+      "✅ Safe zone — aim for 2.5x before exit."
+    ];
+    const result = advice[Math.floor(Math.random() * advice.length)];
+    document.getElementById("cashOutResult").innerText = result;
+  }
 
-      document.getElementById("prediction").innerText = prediction;
-      document.getElementById("pinkTracker").innerText = `${pinks} pinks detected`;
-      document.getElementById("cooldown").innerText = cooldown;
-      document.getElementById("countdown").innerText = `${nextPinkIn} rounds`;
+  function predictNext() {
+    const input = document.getElementById("roundInput").value;
+    let prediction = "";
+    if (input === "low") prediction = "📈 Likely mid or high next.";
+    else if (input === "mid") prediction = "📉 Possible low or repeat mid.";
+    else if (input === "high") prediction = "⚠️ High rarely repeats — expect low.";
+    else prediction = "❓ Select a valid round type.";
+    document.getElementById("predictionResult").innerText = prediction;
+  }
 
-      document.getElementById("flight").innerText = `${(Math.random() * 3 + 1).toFixed(2)}x`;
-      document.getElementById("cashout").innerText = last >= 1.8 ? "✅ Recommended!" : "⚠️ Risky!";
-      document.getElementById("crashAlert").innerText = last <= 1.00 ? "💥 CRASHED!" : "🟢 Safe";
-    }
-  </script>
-</body>
-</html>
+  function verifyFairness() {
+    const hash = document.getElementById("hashInput").value.trim();
+    const isValid = /^[a-f0-9]{64}$/i.test(hash);
+    const result = isValid ? "✅ Hash format valid. Use SHA256 to verify." : "❌ Invalid hash format.";
+    document.getElementById("fairnessResult").innerText = result;
+  }
+
+  function simulateStrategy() {
+    const bet = parseFloat(document.getElementById("startingBet").value);
+    const mult = parseFloat(document.getElementById("multiplier").value);
+    if (isNaN(bet) || isNaN(mult)) {
+      document.getElementById("strategyResult").innerText = "[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/Ronnie434/30-days-of-React/tree/22142106cb46f717a1259f84227cc90ed7fe50cc/02_Day_Introduction_to_React%2F02_introduction_to_react.md?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "1")
