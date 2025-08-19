@@ -2,168 +2,100 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Aviator Companion Pro+</title>
-  <link rel="manifest" href="manifest.json">
   <style>
-    body { font-family: Arial, sans-serif; background: #111; color: #eee; padding: 20px; }
-    h1 { color: #ff004f; }
-    .section { margin-bottom: 30px; }
-    button, select, input {
-      padding: 10px; font-size: 16px; border-radius: 5px; border: none;
-      background: #ff004f; color: white; cursor: pointer;
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #eee;
+      margin: 0;
+      padding: 20px;
     }
-    input, select { background: #222; color: #eee; border: 1px solid #444; }
-    .result { background: #222; padding: 10px; border-radius: 5px; margin-top: 10px; }
-    .green { color: #00ff99; } .red { color: #ff4444; } .pink { color: #ff69b4; } .yellow { color: #ffff66; }
+    h1 { color: #ff4081; }
+    select, input, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      font-size: 1em;
+    }
+    .section {
+      border: 1px solid #444;
+      padding: 15px;
+      margin-bottom: 20px;
+      background: #222;
+    }
+    .alert { color: #ff4081; font-weight: bold; }
   </style>
 </head>
-<body onload="startGate()">
+<body>
+  <h1>🚀 Aviator Companion Pro+</h1>
 
-  <!-- 🔐 Step 1: Password -->
-  <div id="step1" class="section">
-    <h1>🔐 Enter Access Code</h1>
-    <input type="password" id="pass" placeholder="Enter password" />
-    <button onclick="validatePassword()">Next</button>
-    <div id="auth-msg" class="result red"></div>
+  <div class="section">
+    <label for="password">🔐 Enter Access Password:</label>
+    <input type="password" id="password" placeholder="Enter password" />
+    <button onclick="checkPassword()">Unlock Features</button>
+    <p id="accessStatus"></p>
   </div>
 
-  <!-- 🌐 Step 2: Betting Site Dropdown -->
-  <div id="step2" class="section" style="display:none;">
-    <h1>🌐 Select Your Betting Site</h1>
-    <select id="site">
-      <option value="">-- Choose a site --</option>
-      <option value="africabet">Africabet.com</option>
-      <option value="spincity">Spincity.co.zw</option>
-      <option value="betway">Betway</option>
-      <option value="hollywoodbets">Hollywoodbets</option>
-    </select>
-    <button onclick="validateSite()">Launch Bot</button>
-    <div id="site-msg" class="result red"></div>
-  </div>
-
-  <!-- ✈️ Aviator Predictor App -->
-  <div id="app" style="display:none;">
-    <h1>✈️ Aviator Live Predictor</h1>
+  <div id="mainApp" style="display:none;">
+    <div class="section">
+      <label for="site">🌐 Select Betting Site:</label>
+      <select id="site">
+        <option value="spincity">Spincity.co.zw</option>
+        <option value="africabet">Africabet.com</option>
+      </select>
+    </div>
 
     <div class="section">
-      <button onclick="scrapeCrash()">🔄 Get Live Crash Data</button>
-      <select id="mode">
-        <option value="safe">Safe</option>
-        <option value="adaptive" selected>Adaptive</option>
-        <option value="aggressive">Aggressive</option>
-      </select>
-      <button onclick="predictNext()">Predict Next Round</button>
-      <button onclick="startFlightSimulation()">🚀 Simulate Flight</button>
-      <div id="prediction" class="result"></div>
-      <div id="tracker" class="result"></div>
-      <div id="countdown" class="result"></div>
+      <label for="data">🔄 Paste Crash Data:</label>
+      <textarea id="data" rows="5" placeholder="e.g. 1.23, 2.01, 1.00..."></textarea>
+      <button onclick="analyzeData()">Run Prediction</button>
+    </div>
+
+    <div class="section">
+      <p>🎯 Prediction: <span id="prediction">--</span></p>
+      <p>🎀 Pink Round Tracker: <span id="pinkTracker">--</span></p>
+      <p>⚠️ Cooldown Status: <span id="cooldown">--</span></p>
+      <p>⏳ Countdown to Next Pink: <span id="countdown">--</span></p>
+    </div>
+
+    <div class="section">
+      <p>🚀 Flight Simulation: <span id="flight">--</span></p>
+      <p class="alert">💸 Cash Out NOW Alert: <span id="cashout">--</span></p>
+      <p class="alert">💥 Crash Alert: <span id="crashAlert">--</span></p>
     </div>
   </div>
 
   <script>
-    const correctPassword = "aviator2025";
-    let crashHistory = [];
-    let pinkETA = null;
-    let liveMultiplier = 1.00;
-    let predictedCrash = 2.50;
-    let flightInterval;
-    let selectedSite = "";
-
-    function startGate() {
-      document.getElementById("step1").style.display = "block";
-      document.getElementById("step2").style.display = "none";
-      document.getElementById("app").style.display = "none";
-    }
-
-    function validatePassword() {
-      const input = document.getElementById("pass").value;
-      if (input === correctPassword) {
-        document.getElementById("step1").style.display = "none";
-        document.getElementById("step2").style.display = "block";
+    function checkPassword() {
+      const pass = document.getElementById("password").value;
+      if (pass === "aviator2025") {
+        document.getElementById("mainApp").style.display = "block";
+        document.getElementById("accessStatus").innerText = "✅ Access granted!";
       } else {
-        document.getElementById("auth-msg").innerText = "❌ Incorrect password";
+        document.getElementById("accessStatus").innerText = "❌ Incorrect password.";
       }
     }
 
-    function validateSite() {
-      const site = document.getElementById("site").value;
-      if (site === "africabet" || site === "spincity") {
-        selectedSite = site;
-        document.getElementById("step2").style.display = "none";
-        document.getElementById("app").style.display = "block";
-      } else {
-        document.getElementById("site-msg").innerText = "❌ Unsupported site. Please select Africabet or Spincity.";
-      }
+    function analyzeData() {
+      const raw = document.getElementById("data").value;
+      const values = raw.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+      const last = values[values.length - 1];
+      const pinks = values.filter(v => v >= 2.0).length;
+      const cooldown = last < 1.2 ? "Active" : "Clear";
+      const nextPinkIn = 5 - (pinks % 5);
+      const prediction = last < 1.2 ? "High chance of pink soon" : "Low chance";
+
+      document.getElementById("prediction").innerText = prediction;
+      document.getElementById("pinkTracker").innerText = `${pinks} pinks detected`;
+      document.getElementById("cooldown").innerText = cooldown;
+      document.getElementById("countdown").innerText = `${nextPinkIn} rounds`;
+
+      document.getElementById("flight").innerText = `${(Math.random() * 3 + 1).toFixed(2)}x`;
+      document.getElementById("cashout").innerText = last >= 1.8 ? "✅ Recommended!" : "⚠️ Risky!";
+      document.getElementById("crashAlert").innerText = last <= 1.00 ? "💥 CRASHED!" : "🟢 Safe";
     }
-
-    function scrapeCrash() {
-      const fakePageData = ["1.01", "1.23", "2.50", "1.01", "1.01", "49.99", "1.01", "3.00", "1.01", "1.01"];
-      crashHistory = fakePageData.map(v => parseFloat(v));
-      alert("✅ Crash data loaded: " + crashHistory.join(", "));
-    }
-
-    function predictNext() {
-      if (crashHistory.length < 5) return alert("Need at least 5 crash values");
-      const mode = document.getElementById("mode").value;
-      const avg = crashHistory.reduce((a,b) => a+b, 0) / crashHistory.length;
-      const last = crashHistory[crashHistory.length - 1];
-      let next = 1.0, risk = "Unknown";
-
-      if (mode === "safe") {
-        next = last < 2 ? 1.5 : 2.0;
-        risk = last < 1.2 ? "High" : "Low";
-      } else if (mode === "aggressive") {
-        next = last > 10 ? 1.01 : Math.random() * 5 + 1;
-        risk = next < 2 ? "High" : "Medium";
-      } else {
-        next = avg < 2 ? 1.3 : avg > 10 ? 1.01 : avg;
-        risk = avg < 1.5 ? "High" : avg > 5 ? "Low" : "Medium";
-      }
-
-      predictedCrash = next;
-
-      const pinks = crashHistory.filter(v => v > 10);
-      const lastPinkIndex = crashHistory.lastIndexOf(pinks[pinks.length - 1]);
-      const roundsSincePink = crashHistory.length - lastPinkIndex - 1;
-      const pinkDue = roundsSincePink >= 20 ? "🎀 Pink round likely soon!" : `Last pink was ${roundsSincePink} rounds ago`;
-
-      const lowStreak = crashHistory.slice(-5).filter(v => v < 1.5).length;
-      const cooldown = lowStreak >= 3 ? "⚠️ Cooldown detected — play cautiously" : "✅ No cooldown streak";
-
-      const pinkCountdown = estimatePinkTime(crashHistory);
-
-      document.getElementById("prediction").innerHTML =
-        `Next Multiplier: <span class="green">${next.toFixed(2)}x</span><br>Risk Level: <span class="${risk === 'High' ? 'red' : risk === 'Low' ? 'green' : 'yellow'}">${risk}</span>`;
-
-      document.getElementById("tracker").innerHTML =
-        `<span class="pink">${pinkDue}</span><br><span class="${lowStreak >= 3 ? 'red' : 'green'}">${cooldown}</span><br><span class="pink">${pinkCountdown}</span>`;
-    }
-
-    function estimatePinkTime(values) {
-      const pinks = values.filter(v => v > 10);
-      if (pinks.length < 2) return "Not enough pinks to estimate";
-
-      const lastPinkIndex = values.lastIndexOf(pinks[pinks.length - 1]);
-      const spacing = Math.round(values.length / pinks.length);
-      const roundsSince = values.length - lastPinkIndex - 1;
-      const roundsUntilNext = spacing - roundsSince;
-      const secondsUntilNext = roundsUntilNext * 15;
-
-      const now = new Date();
-      pinkETA = new Date(now.getTime() + secondsUntilNext * 1000);
-      return `🎯 Catch pink at ${pinkETA.toLocaleTimeString()} (${roundsUntilNext} rounds away)`;
-    }
-
-    function startFlightSimulation() {
-      liveMultiplier = 1.00;
-      clearInterval(flightInterval);
-
-      flightInterval = setInterval(() => {
-        liveMultiplier += 0.05;
-        document.getElementById("countdown").innerHTML =
-          `✈️ Multiplier: <span class="yellow">${liveMultiplier.toFixed(2)}x</span>`;
-
-        if (liveMultiplier >= predictedCrash - 0.3 && liveMultiplier < predictedCrash) {
-          document.getElementById("tracker").innerHTML =
-            `<span class="red">💸 Cash[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/lzh-yi/Web-Fork-/tree/024b3e55587afdf9f05a677613a75f24e3d1803e/03-CSS%E8%BF%9B%E9%98%B6%2F04-%E5%A6%82%E4%BD%95%E8%AE%A9%E4%B8%80%E4%B8%AA%E5%85%83%E7%B4%A0%E6%B0%B4%E5%B9%B3%E5%9E%82%E7%9B%B4%E5%B1%85%E4%B8%AD%EF%BC%9F.md?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "1")
+  </script>
+</body>
+</html>
