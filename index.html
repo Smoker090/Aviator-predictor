@@ -3,203 +3,82 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aviator Companion Pro+</title>
+  <title>Catch 1.5X and 2X Signals</title>
   <style>
     body {
+      background-color: #111;
+      color: #fff;
       font-family: Arial, sans-serif;
-      background: #111;
-      color: #eee;
-      padding: 20px;
       text-align: center;
+      padding: 20px;
     }
-    .section {
-      background: #222;
-      padding: 15px;
-      margin-bottom: 20px;
+    h1 {
+      color: hotpink;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .signal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .signal-box {
+      background-color: #222;
       border-radius: 8px;
-    }
-    input, select, button, textarea {
       padding: 10px;
-      margin-top: 10px;
-      font-size: 1em;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 6px;
-      border: none;
+      font-size: 16px;
+      border: 1px solid hotpink;
     }
-    button {
-      background: #ff4081;
-      color: white;
+    .btn {
+      background-color: hotpink;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      margin-top: 20px;
       cursor: pointer;
     }
-    canvas {
-      width: 100%;
-      height: 150px;
-      background: #333;
-      margin-top: 10px;
-      border-radius: 6px;
-    }
-    .result {
-      margin-top: 10px;
-      white-space: pre-line;
+    .contact {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
 
-  <!-- 🔐 Password Gate -->
-  <div class="section" id="loginSection">
-    <h2>🔐 Enter Access Password</h2>
-    <input type="password" id="passwordInput" placeholder="Enter password" />
-    <button onclick="checkPassword()">Unlock</button>
-    <div id="authStatus" class="result"></div>
-  </div>
+  <h1>Catch 1.5X and 2X</h1>
+  <button class="btn" onclick="generateSignals()">Generate Signals</button>
 
-  <!-- 🚀 Main App -->
-  <div id="mainApp" style="display:none;">
-    <!-- 🌐 Site Selector -->
-    <div class="section">
-      <h2>🌐 Select Betting Site</h2>
-      <select id="siteSelector">
-        <option value="spincity">SpinCity</option>
-        <option value="africabet">AfricaBet</option>
-      </select>
-    </div>
+  <div class="signal-grid" id="signalGrid"></div>
 
-    <!-- 🔄 Auto Prediction -->
-    <div class="section">
-      <h2>🔄 Auto Prediction</h2>
-      <textarea id="crashInput" rows="3" placeholder="Paste last 10 crash values..."></textarea>
-      <button onclick="startAutoPredict()">Start Prediction</button>
-      <div id="predictionOutput" class="result"></div>
-    </div>
-
-    <!-- 🎀 Pink Round Countdown -->
-    <div class="section">
-      <h2>🎀 Pink Round Countdown</h2>
-      <button onclick="startPinkClock()">Start Clock</button>
-      <div id="pinkClockResult" class="result"></div>
-    </div>
-
-    <!-- 📈 Visual Flight Tracker -->
-    <div class="section">
-      <h2>📈 Flight Tracker</h2>
-      <canvas id="flightCanvas"></canvas>
-    </div>
+  <div class="contact">
+    Contact Chris +263784087951
   </div>
 
   <script>
-    const correctPassword = "aviatorpro2025";
-    let autoInterval, pinkClockInterval;
-
-    function checkPassword() {
-      const input = document.getElementById("passwordInput").value;
-      if (input === correctPassword) {
-        document.getElementById("loginSection").style.display = "none";
-        document.getElementById("mainApp").style.display = "block";
-      } else {
-        document.getElementById("authStatus").innerText = "❌ Incorrect password.";
+    function generateSignals() {
+      const grid = document.getElementById("signalGrid");
+      grid.innerHTML = "";
+      const now = new Date();
+      now.setSeconds(50); // Start signals at :50 seconds
+      for (let i = 0; i < 8; i++) {
+        const signalTime = new Date(now.getTime() + i * 2 * 60000); // every 2 minutes
+        const hh = String(signalTime.getHours()).padStart(2, '0');
+        const mm = String(signalTime.getMinutes()).padStart(2, '0');
+        const ss = String(signalTime.getSeconds()).padStart(2, '0');
+        const timeStr = `${hh}:${mm}:${ss}`;
+        const box = document.createElement("div");
+        box.className = "signal-box";
+        box.innerHTML = `<strong>Signal ${i + 1}</strong><br>${timeStr}`;
+        grid.appendChild(box);
       }
     }
 
-    function startAutoPredict() {
-      clearInterval(autoInterval);
-      autoInterval = setInterval(() => {
-        runPrediction();
-      }, 10000);
-      runPrediction();
-    }
-
-    function runPrediction() {
-      const raw = document.getElementById("crashInput").value;
-      const values = raw.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
-      if (values.length < 5) {
-        document.getElementById("predictionOutput").innerText = "⚠️ Enter at least 5 crash values.";
-        return;
-      }
-
-      const avg = values.reduce((a,b) => a+b, 0) / values.length;
-      const volatility = Math.max(...values) - Math.min(...values);
-      const pinks = values.filter(v => v >= 10);
-      const lastPinkIndex = values.lastIndexOf(pinks[pinks.length - 1]);
-      const roundsSincePink = values.length - lastPinkIndex - 1;
-      const spacing = pinks.length >= 2 ? pinks[pinks.length - 1] - pinks[pinks.length - 2] : null;
-      const pinkETA = spacing ? spacing - roundsSincePink : null;
-
-      let advice = "";
-      if (values.slice(-3).every(v => v < 1.5)) {
-        advice = "⚠️ Cooldown streak detected — wait.";
-      } else if (avg > 2.5 && volatility < 5) {
-        advice = "✅ Stable pattern — good time to bet.";
-      } else if (pinkETA !== null && pinkETA <= 2) {
-        advice = "🎯 Pink round likely soon — prepare to enter.";
-      } else {
-        advice = "⏳ Mixed signals — bet cautiously.";
-      }
-
-      const prediction = avg + (volatility > 10 ? 1.5 : 0.5);
-      const rounded = Math.round(prediction * 100) / 100;
-
-      document.getElementById("predictionOutput").innerText =
-        `📈 Estimated next multiplier: ${rounded}x\n${advice}`;
-
-      drawFlight(rounded);
-    }
-
-    function startPinkClock() {
-      clearInterval(pinkClockInterval);
-      const raw = document.getElementById("crashInput").value;
-      const values = raw.split(',').map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
-      const pinks = values.map((v, i) => v >= 10 ? i : -1).filter(i => i !== -1);
-
-      if (pinks.length < 2) {
-        document.getElementById("pinkClockResult").innerText = "🎀 Not enough pinks to estimate timing.";
-        return;
-      }
-
-      const lastPinkIndex = pinks[pinks.length - 1];
-      const spacing = pinks[pinks.length - 1] - pinks[pinks.length - 2];
-      const roundsSince = values.length - lastPinkIndex - 1;
-      const roundsRemaining = spacing - roundsSince;
-
-      const secondsPerRound = 8;
-      let secondsLeft = roundsRemaining * secondsPerRound;
-
-      if (secondsLeft <= 0) {
-        document.getElementById("pinkClockResult").innerText = "🎯 Pink round may be imminent!";
-        return;
-      }
-
-      pinkClockInterval = setInterval(() => {
-        const mins = Math.floor(secondsLeft / 60);
-        const secs = secondsLeft % 60;
-        document.getElementById("pinkClockResult").innerText =
-          `⏳ Estimated pink in ${roundsRemaining} rounds\n🕒 Countdown: ${mins}m ${secs}s`;
-
-        secondsLeft--;
-        if (secondsLeft < 0) {
-          clearInterval(pinkClockInterval);
-          document.getElementById("pinkClockResult").innerText = "🎯 Pink round may be imminent!";
-        }
-      }, 1000);
-    }
-
-    function drawFlight(multiplier) {
-      const canvas = document.getElementById("flightCanvas");
-      const ctx = canvas.getContext("2d");
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      ctx.beginPath();
-      ctx.moveTo(0, canvas.height);
-      for (let x = 0; x <= canvas.width; x++) {
-        const y = canvas.height - Math.pow(x / canvas.width, 1.5) * multiplier * 10;
-        ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = "#0f0";
-      ctx.stroke();
-    }
+    // Auto-generate on load
+    generateSignals();
   </script>
 
 </body>
