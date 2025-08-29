@@ -61,7 +61,7 @@
   <div id="loginSection">
     <h2>🔐 Enter Access Password</h2>
     <input type="password" id="passwordInput" placeholder="Enter password" />
-    <button class="btn" onclick="checkPassword()">Unlock</button>
+    <button class="btn" id="unlockBtn">Unlock</button>
     <div id="authStatus" class="contact"></div>
   </div>
 
@@ -76,7 +76,7 @@
   <script>
     const correctPassword = "dopeaccess2025";
 
-    function checkPassword() {
+    document.getElementById("unlockBtn").addEventListener("click", function () {
       const input = document.getElementById("passwordInput").value;
       if (input === correctPassword) {
         document.getElementById("loginSection").style.display = "none";
@@ -85,8 +85,26 @@
       } else {
         document.getElementById("authStatus").innerText = "❌ Incorrect password.";
       }
-    }
+    });
 
     function generateSignals() {
       const grid = document.getElementById("signalGrid");
-      grid.innerHTML =
+      grid.innerHTML = "";
+      const now = new Date();
+      now.setSeconds(50); // Start signals at :50 seconds
+      for (let i = 0; i < 8; i++) {
+        const signalTime = new Date(now.getTime() + i * 2 * 60000); // every 2 minutes
+        const hh = String(signalTime.getHours()).padStart(2, '0');
+        const mm = String(signalTime.getMinutes()).padStart(2, '0');
+        const ss = String(signalTime.getSeconds()).padStart(2, '0');
+        const timeStr = `${hh}:${mm}:${ss}`;
+        const box = document.createElement("div");
+        box.className = "signal-box";
+        box.innerHTML = `<strong>Signal ${i + 1}</strong><br>${timeStr}`;
+        grid.appendChild(box);
+      }
+    }
+  </script>
+
+</body>
+</html>
