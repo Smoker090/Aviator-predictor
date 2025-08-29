@@ -53,6 +53,10 @@
       width: 80%;
       margin-top: 10px;
     }
+    a {
+      color: hotpink;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
@@ -62,7 +66,9 @@
     <h2>🔐 Enter Access Code</h2>
     <input type="text" id="accessCode" placeholder="Enter code from Dope" />
     <button class="btn" id="unlockBtn">Unlock</button>
-    <p class="contact">Don't have a code? <a href="https://wa.me/263773542286?text=Hi%20Dope,%20I%20want%20access%20to%20your%20signal%20bot" style="color:hotpink;">Request on WhatsApp</a></p>
+    <p class="contact">
+      Don't have a code? <a href="https://wa.me/263773542286?text=Hi%20Dope,%20I%20want%20access%20to%20your%20signal%20bot">Request on WhatsApp</a>
+    </p>
     <div id="authStatus" class="contact"></div>
   </div>
 
@@ -75,7 +81,7 @@
   </div>
 
   <script>
-    const approvedCodes = ["dope123", "vip456", "trusted2025"];
+    const approvedCodes = ["dopeaccess2025"];
 
     document.getElementById("unlockBtn").addEventListener("click", function () {
       const input = document.getElementById("accessCode").value.trim();
@@ -92,9 +98,9 @@
       const grid = document.getElementById("signalGrid");
       grid.innerHTML = "";
       const now = new Date();
-      now.setSeconds(50);
+      now.setSeconds(50); // Start signals at :50 seconds
       for (let i = 0; i < 8; i++) {
-        const signalTime = new Date(now.getTime() + i * 2 * 60000);
+        const signalTime = new Date(now.getTime() + i * 2 * 60000); // every 2 minutes
         const hh = String(signalTime.getHours()).padStart(2, '0');
         const mm = String(signalTime.getMinutes()).padStart(2, '0');
         const ss = String(signalTime.getSeconds()).padStart(2, '0');
