@@ -3,112 +3,94 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Catch 1.5X and 2X Signals</title>
+  <title>KADIKI KACHO - Aviator Signals</title>
   <style>
     body {
-      background-color: #111;
+      background-color: #000;
       color: #fff;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       text-align: center;
       padding: 20px;
     }
     h1 {
-      color: hotpink;
-      font-size: 24px;
-      margin-bottom: 10px;
+      font-size: 28px;
+      color: #ff00cc;
+      margin-bottom: 5px;
     }
-    .signal-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 20px;
+    h2 {
+      font-size: 18px;
+      color: #ccc;
+      margin-bottom: 20px;
     }
     .signal-box {
-      background-color: #222;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid hotpink;
+      background-color: #1a1a1a;
+      border: 2px solid #ff00cc;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px auto;
+      width: 90%;
+      font-size: 18px;
+      color: #fff;
     }
     .btn {
-      background-color: hotpink;
+      background-color: #ff00cc;
       color: #fff;
       border: none;
       padding: 12px 20px;
       font-size: 16px;
-      border-radius: 6px;
-      margin-top: 20px;
+      border-radius: 8px;
       cursor: pointer;
-    }
-    .contact {
-      margin-top: 30px;
-      font-size: 14px;
-      color: #ccc;
-    }
-    input {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
-      width: 80%;
       margin-top: 10px;
     }
-    a {
-      color: hotpink;
-      text-decoration: none;
+    .footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #aaa;
+    }
+    .flag {
+      font-size: 18px;
+      margin-left: 5px;
     }
   </style>
 </head>
 <body>
 
-  <!-- 🔐 WhatsApp Verification Gate -->
-  <div id="loginSection">
-    <h2>🔐 Enter Access Code</h2>
-    <input type="text" id="accessCode" placeholder="Enter code from Dope" />
-    <button class="btn" id="unlockBtn">Unlock</button>
-    <p class="contact">
-      Don't have a code? <a href="https://wa.me/263773542286?text=Hi%20Dope,%20I%20want%20access%20to%20your%20signal%20bot">Request on WhatsApp</a>
-    </p>
-    <div id="authStatus" class="contact"></div>
-  </div>
+  <h1>⚡ KADIKI KACHO ⚡</h1>
+  <h2>Zimbabwe Time: <span id="zimTime">--:--</span> <span class="flag">🇿🇼</span></h2>
 
-  <!-- 🚀 Signal Bot -->
-  <div id="mainApp" style="display:none;">
-    <h1>Catch 1.5X and 2X</h1>
-    <button class="btn" onclick="generateSignals()">Generate Signals</button>
-    <div class="signal-grid" id="signalGrid"></div>
-    <div class="contact">Contact Dope 0773542286</div>
+  <button class="btn" onclick="generateSignals()">Generate 5 Signals</button>
+
+  <div id="signalContainer"></div>
+
+  <div class="footer">
+    Powered by Dope Signals | Contact: 0773542286
   </div>
 
   <script>
-    const approvedCodes = ["dopeaccess2025"];
-
-    document.getElementById("unlockBtn").addEventListener("click", function () {
-      const input = document.getElementById("accessCode").value.trim();
-      if (approvedCodes.includes(input)) {
-        document.getElementById("loginSection").style.display = "none";
-        document.getElementById("mainApp").style.display = "block";
-        generateSignals();
-      } else {
-        document.getElementById("authStatus").innerText = "❌ Invalid code. Request access from Dope.";
-      }
-    });
+    function updateTime() {
+      const now = new Date();
+      const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Africa/Harare' };
+      const timeStr = now.toLocaleTimeString('en-GB', options);
+      document.getElementById("zimTime").textContent = timeStr;
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
 
     function generateSignals() {
-      const grid = document.getElementById("signalGrid");
-      grid.innerHTML = "";
+      const container = document.getElementById("signalContainer");
+      container.innerHTML = "";
       const now = new Date();
-      now.setSeconds(50); // Start signals at :50 seconds
-      for (let i = 0; i < 8; i++) {
-        const signalTime = new Date(now.getTime() + i * 2 * 60000); // every 2 minutes
+      for (let i = 1; i <= 5; i++) {
+        const signalTime = new Date(now.getTime() + i * 1000); // 1 sec apart
         const hh = String(signalTime.getHours()).padStart(2, '0');
         const mm = String(signalTime.getMinutes()).padStart(2, '0');
         const ss = String(signalTime.getSeconds()).padStart(2, '0');
         const timeStr = `${hh}:${mm}:${ss}`;
+        const multiplier = (Math.random() * 5 + 2).toFixed(1); // 2.0X to 7.0X
         const box = document.createElement("div");
         box.className = "signal-box";
-        box.innerHTML = `<strong>Signal ${i + 1}</strong><br>${timeStr}`;
-        grid.appendChild(box);
+        box.innerHTML = `🚀 Signal ${i}: <strong>${timeStr}</strong> — <span style="color:#00ffcc">${multiplier}X</span>`;
+        container.appendChild(box);
       }
     }
   </script>
