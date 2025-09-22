@@ -2,165 +2,98 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Aviator Companion Pro+</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KADIKI KACHO - Aviator Signals</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #111; color: #eee; padding: 20px; }
-    h1 { color: #ff004f; }
-    .section { margin-bottom: 30px; }
-    textarea, input, select, button {
-      width: 100%; margin: 10px 0; padding: 10px; font-size: 16px;
-      border-radius: 5px; border: none;
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 20px;
     }
-    button { background: #ff004f; color: white; cursor: pointer; }
-    .result { background: #222; padding: 10px; border-radius: 5px; }
-    canvas { background: #222; border-radius: 5px; margin-top: 10px; width: 100%; height: 200px; }
-    .green { color: #00ff99; } .red { color: #ff4444; } .pink { color: #ff69b4; }
+    h1 {
+      font-size: 28px;
+      color: #ff00cc;
+      margin-bottom: 5px;
+    }
+    h2 {
+      font-size: 18px;
+      color: #ccc;
+      margin-bottom: 20px;
+    }
+    .signal-box {
+      background-color: #1a1a1a;
+      border: 2px solid #ff00cc;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px auto;
+      width: 90%;
+      font-size: 18px;
+      color: #fff;
+    }
+    .btn {
+      background-color: #ff00cc;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 14px;
+      color: #aaa;
+    }
+    .flag {
+      font-size: 18px;
+      margin-left: 5px;
+    }
   </style>
 </head>
 <body>
-  <h1>🧠 Aviator Companion Pro+</h1>
 
-  <div class="section">
-    <h2>📥 Paste Crash Values</h2>
-    <textarea id="crashInput" rows="4" placeholder="e.g. 1.23, 2.01, 1.01, 100.00, ..."></textarea>
-    <select id="mode">
-      <option value="safe">Safe</option>
-      <option value="adaptive" selected>Adaptive</option>
-      <option value="aggressive">Aggressive</option>
-    </select>
-    <button onclick="predictNext()">Predict Next Round</button>
-    <div id="prediction" class="result"></div>
-  </div>
+  <h1>⚡ KADIKI KACHO ⚡</h1>
+  <h2>Zimbabwe Time: <span id="zimTime">--:--</span> <span class="flag">🇿🇼</span></h2>
 
-  <div class="section">
-    <h2>🔐 Fairness Verifier</h2>
-    <input id="serverSeed" placeholder="Revealed serverSeed (SHA256)" />
-    <input id="nonce" placeholder="Nonce (e.g. 1, 2, 3...)" />
-    <button onclick="verifyCrash()">Verify Crash</button>
-    <div id="verification" class="result"></div>
-  </div>
+  <button class="btn" onclick="generateSignals()">Generate 5 Signals</button>
 
-  <div class="section">
-    <h2>📊 Crash Trend Graph</h2>
-    <canvas id="crashChart" width="400" height="200"></canvas>
-    <button onclick="drawGraph()">Draw Graph</button>
-  </div>
+  <div id="signalContainer"></div>
 
-  <div class="section">
-    <h2>🎛 Strategy Simulator</h2>
-    <input id="cashoutTarget" placeholder="Auto cashout multiplier (e.g. 1.5)" />
-    <button onclick="simulateStrategy()">Simulate 100 Rounds</button>
-    <div id="simResult" class="result"></div>
-  </div>
-
-  <div class="section">
-    <h2>📈 Bet Tracker</h2>
-    <textarea id="betLog" rows="4" placeholder="Paste your bets and outcomes here (e.g. 1.00,1.50)"></textarea>
-    <button onclick="analyzeBets()">Analyze Bets</button>
-    <div id="betStats" class="result"></div>
-  </div>
-
-  <div class="section">
-    <h2>🧠 Smart Strategy Advisor</h2>
-    <button onclick="recommendStrategy()">Get Recommendation</button>
-    <div id="advisor" class="result"></div>
+  <div class="footer">
+    Powered by Dope Signals | Contact: 0773542286
   </div>
 
   <script>
-    function parseCrashValues() {
-      const input = document.getElementById("crashInput").value;
-      return input.split(",").map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+    function updateTime() {
+      const now = new Date();
+      const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Africa/Harare' };
+      const timeStr = now.toLocaleTimeString('en-GB', options);
+      document.getElementById("zimTime").textContent = timeStr;
     }
+    setInterval(updateTime, 1000);
+    updateTime();
 
-    function predictNext() {
-      const values = parseCrashValues();
-      const mode = document.getElementById("mode").value;
-      if (values.length < 5) return alert("Paste at least 5 crash values");
-
-      const avg = values.reduce((a,b) => a+b, 0) / values.length;
-      const last = values[values.length - 1];
-      let next = 1.0, risk = "Unknown";
-
-      if (mode === "safe") {
-        next = last < 2 ? 1.5 : 2.0;
-        risk = last < 1.2 ? "High" : "Low";
-      } else if (mode === "aggressive") {
-        next = last > 10 ? 1.01 : Math.random() * 5 + 1;
-        risk = next < 2 ? "High" : "Medium";
-      } else {
-        next = avg < 2 ? 1.3 : avg > 10 ? 1.01 : avg;
-        risk = avg < 1.5 ? "High" : avg > 5 ? "Low" : "Medium";
+    function generateSignals() {
+      const container = document.getElementById("signalContainer");
+      container.innerHTML = "";
+      const now = new Date();
+      for (let i = 1; i <= 5; i++) {
+        const signalTime = new Date(now.getTime() + i * 1000); // 1 sec apart
+        const hh = String(signalTime.getHours()).padStart(2, '0');
+        const mm = String(signalTime.getMinutes()).padStart(2, '0');
+        const ss = String(signalTime.getSeconds()).padStart(2, '0');
+        const timeStr = `${hh}:${mm}:${ss}`;
+        const multiplier = (Math.random() * 5 + 2).toFixed(1); // 2.0X to 7.0X
+        const box = document.createElement("div");
+        box.className = "signal-box";
+        box.innerHTML = `🚀 Signal ${i}: <strong>${timeStr}</strong> — <span style="color:#00ffcc">${multiplier}X</span>`;
+        container.appendChild(box);
       }
-
-      document.getElementById("prediction").innerHTML =
-        `Next Multiplier: <span class="green">${next.toFixed(2)}x</span><br>Risk Level: <span class="${risk === 'High' ? 'red' : risk === 'Low' ? 'green' : 'pink'}">${risk}</span>`;
     }
+  </script>
 
-    function verifyCrash() {
-      const seed = document.getElementById("serverSeed").value.trim();
-      const nonce = parseInt(document.getElementById("nonce").value.trim());
-      if (!seed || isNaN(nonce)) return alert("Enter valid seed and nonce");
-
-      const encoder = new TextEncoder();
-      const keyData = encoder.encode(seed);
-      crypto.subtle.importKey("raw", keyData, {name: "HMAC", hash: "SHA-256"}, false, ["sign"])
-        .then(key => crypto.subtle.sign("HMAC", key, encoder.encode(nonce.toString())))
-        .then(sig => {
-          const hashArray = Array.from(new Uint8Array(sig));
-          const hex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-          const int = parseInt(hex.substring(0, 13), 16);
-          const crash = Math.floor(100 / ((int / Math.pow(2, 52)) + 1)) / 100;
-          document.getElementById("verification").innerHTML = `Verified Crash: <span class="green">${crash.toFixed(2)}x</span>`;
-        });
-    }
-
-    function drawGraph() {
-      const values = parseCrashValues();
-      const canvas = document.getElementById("crashChart");
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.beginPath();
-      ctx.moveTo(0, canvas.height - (values[0] * 10));
-      values.forEach((v, i) => {
-        const x = i * (canvas.width / values.length);
-        const y = canvas.height - (v * 10);
-        ctx.lineTo(x, y);
-      });
-      ctx.strokeStyle = "#ff004f";
-      ctx.stroke();
-    }
-
-    function simulateStrategy() {
-      const target = parseFloat(document.getElementById("cashoutTarget").value);
-      if (isNaN(target)) return alert("Enter a valid cashout multiplier");
-      let wins = 0, total = 0;
-      for (let i = 0; i < 100; i++) {
-        const crash = Math.random() < 0.02 ? 100 : Math.random() * 5 + 1;
-        if (crash >= target) wins++;
-        total += crash >= target ? target : 0;
-      }
-      document.getElementById("simResult").innerHTML =
-        `Win Rate: ${wins}%<br>Estimated Profit: <span class="green">${total.toFixed(2)}</span>`;
-    }
-
-    function analyzeBets() {
-      const log = document.getElementById("betLog").value.trim().split("\n");
-      let wins = 0, total = 0;
-      log.forEach(line => {
-        const parts = line.split(",");
-        const bet = parseFloat(parts[0]);
-        const result = parseFloat(parts[1]);
-        if (!isNaN(bet) && !isNaN(result)) {
-          total += result;
-          if (result >= bet) wins++;
-        }
-      });
-      const roi = ((total - log.length) / log.length) * 100;
-      document.getElementById("betStats").innerHTML =
-        `Win Rate: ${wins} / ${log.length}<br>ROI: <span class="green">${roi.toFixed(2)}%</span>`;
-    }
-
-    function recommendStrategy() {
-      const values = parseCrashValues();
-      if (values.length < 5) return alert("[43dcd9a7-70db-4a1f-b0ae-981daa162054](https://github.com/Ronnie434/30-days-of-React/tree/22142106cb46f717a1259f84227cc90ed7fe50cc/02_Day_Introduction_to_React%2F02_introduction_to_react.md?citationMarker=43dcd9a7-70db-4a1f-b0ae-981daa162054 "1")
+</body>
+</html>
