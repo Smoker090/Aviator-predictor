@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KADIKI KACHO - Aviator Signals</title>
+  <title>MR CRASHER</title>
   <style>
     body {
-      background-color: #000;
+      background-color: #1a0026;
       color: #fff;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
       padding: 20px;
+      background-image: radial-gradient(circle at center, #330044 0%, #1a0026 100%);
     }
     h1 {
       font-size: 28px;
@@ -23,7 +24,7 @@
       margin-bottom: 20px;
     }
     .signal-box {
-      background-color: #1a1a1a;
+      background-color: #2a0033;
       border: 2px solid #ff00cc;
       border-radius: 10px;
       padding: 15px;
@@ -55,15 +56,15 @@
 </head>
 <body>
 
-  <h1>⚡ KADIKI KACHO ⚡</h1>
+  <h1>⚡ MR CRASHER ⚡</h1>
   <h2>Zimbabwe Time: <span id="zimTime">--:--</span> <span class="flag">🇿🇼</span></h2>
 
-  <button class="btn" onclick="generateSignals()">Generate 5 Signals</button>
+  <button class="btn" onclick="generateSignals()">Generate Signals (2X–5X)</button>
 
   <div id="signalContainer"></div>
 
   <div class="footer">
-    Powered by Dope Signals | Contact: 0773542286
+    All those using, kindly note the bot will expire on <strong>17th of October</strong>. I will shut down my bot...
   </div>
 
   <script>
@@ -80,16 +81,18 @@
       const container = document.getElementById("signalContainer");
       container.innerHTML = "";
       const now = new Date();
-      for (let i = 1; i <= 5; i++) {
-        const signalTime = new Date(now.getTime() + i * 1000); // 1 sec apart
+
+      for (let i = 0; i < 5; i++) {
+        const signalTime = new Date(now.getTime() + i * 10 * 1000); // 10s apart
         const hh = String(signalTime.getHours()).padStart(2, '0');
         const mm = String(signalTime.getMinutes()).padStart(2, '0');
         const ss = String(signalTime.getSeconds()).padStart(2, '0');
         const timeStr = `${hh}:${mm}:${ss}`;
-        const multiplier = (Math.random() * 5 + 2).toFixed(1); // 2.0X to 7.0X
+        const multiplier = (Math.random() * 3 + 2).toFixed(1); // 2.0X to 5.0X
+
         const box = document.createElement("div");
         box.className = "signal-box";
-        box.innerHTML = `🚀 Signal ${i}: <strong>${timeStr}</strong> — <span style="color:#00ffcc">${multiplier}X</span>`;
+        box.innerHTML = `🚀 ${timeStr} → <span style="color:#00ffcc">${multiplier}X</span> <span style="color:#ccc">(0s)</span>`;
         container.appendChild(box);
       }
     }
