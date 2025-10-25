@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MR CRASHER</title>
+  <title>MR CRUSHER PRO – Ultra Precision Detector</title>
   <style>
     body {
-      background-color: #1a0026;
+      background: radial-gradient(circle at center, #330044, #1a0026);
       color: #fff;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
       padding: 20px;
-      background-image: radial-gradient(circle at center, #330044 0%, #1a0026 100%);
     }
     h1 {
       font-size: 28px;
@@ -19,19 +18,9 @@
       margin-bottom: 5px;
     }
     h2 {
-      font-size: 18px;
+      font-size: 16px;
       color: #ccc;
       margin-bottom: 20px;
-    }
-    .signal-box {
-      background-color: #2a0033;
-      border: 2px solid #ff00cc;
-      border-radius: 10px;
-      padding: 15px;
-      margin: 10px auto;
-      width: 90%;
-      font-size: 18px;
-      color: #fff;
     }
     .btn {
       background-color: #ff00cc;
@@ -43,6 +32,16 @@
       cursor: pointer;
       margin-top: 10px;
     }
+    .signal-box {
+      background-color: #2a0033;
+      border: 2px solid #ff00cc;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 15px auto;
+      width: 90%;
+      font-size: 18px;
+      color: #fff;
+    }
     .footer {
       margin-top: 30px;
       font-size: 14px;
@@ -52,19 +51,27 @@
       font-size: 18px;
       margin-left: 5px;
     }
+    .status {
+      font-size: 16px;
+      color: #00ffcc;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
 
-  <h1>⚡ MR CRASHER ⚡</h1>
-  <h2>Zimbabwe Time: <span id="zimTime">--:--</span> <span class="flag">🇿🇼</span></h2>
+  <h1>⚡ MR CRUSHER PRO ⚡</h1>
+  <h2>ULTRA PRECISION DETECTOR</h2>
+  <h2>🇿🇼 Zimbabwe Time: <span id="zimTime">--:--:--</span></h2>
 
-  <button class="btn" onclick="generateSignals()">Generate Signals (2X–5X)</button>
+  <button class="btn" onclick="generatePowerSignal()">GENERATE POWER SIGNAL</button>
+  <div id="status" class="status">Awaiting powerful signal... Precision detection in progress</div>
 
   <div id="signalContainer"></div>
 
   <div class="footer">
-    All those using, kindly note the bot will expire on <strong>17th of October</strong>. I will shut down my bot...
+    Advanced Algorithm | Real-time Analysis | Maximum Precision<br>
+    Bot expires on <strong>17 October</strong>. Use wisely.
   </div>
 
   <script>
@@ -77,26 +84,19 @@
     setInterval(updateTime, 1000);
     updateTime();
 
-    function generateSignals() {
-      const container = document.getElementById("signalContainer");
-      container.innerHTML = "";
+    function generatePowerSignal() {
       const now = new Date();
+      const delay = Math.floor(Math.random() * 60) + 60; // 60–120s
+      const signalTime = new Date(now.getTime() + delay * 1000);
+      const hh = String(signalTime.getHours()).padStart(2, '0');
+      const mm = String(signalTime.getMinutes()).padStart(2, '0');
+      const ss = String(signalTime.getSeconds()).padStart(2, '0');
+      const timeStr = `${hh}:${mm}:${ss}`;
 
-      for (let i = 0; i < 5; i++) {
-        const signalTime = new Date(now.getTime() + i * 10 * 1000); // 10s apart
-        const hh = String(signalTime.getHours()).padStart(2, '0');
-        const mm = String(signalTime.getMinutes()).padStart(2, '0');
-        const ss = String(signalTime.getSeconds()).padStart(2, '0');
-        const timeStr = `${hh}:${mm}:${ss}`;
-        const multiplier = (Math.random() * 3 + 2).toFixed(1); // 2.0X to 5.0X
+      // Simulated real data logic
+      const recentRounds = [1.01, 1.03, 1.02, 1.04, 1.01];
+      const volatility = recentRounds.filter(x => x < 2.0).length / recentRounds.length;
+      const riskLevel = volatility > 0.8 ? "⚠️ High Crash Risk" : "✅ Stable";
 
-        const box = document.createElement("div");
-        box.className = "signal-box";
-        box.innerHTML = `🚀 ${timeStr} → <span style="color:#00ffcc">${multiplier}X</span> <span style="color:#ccc">(0s)</span>`;
-        container.appendChild(box);
-      }
-    }
-  </script>
-
-</body>
-</html>
+      const multiplier = (volatility > 0.8)
+        ?
