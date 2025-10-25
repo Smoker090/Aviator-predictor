@@ -32,6 +32,14 @@
       cursor: pointer;
       margin-top: 10px;
     }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      width: 80%;
+      margin-top: 10px;
+    }
     .signal-box {
       background-color: #2a0033;
       border: 2px solid #ff00cc;
@@ -64,10 +72,17 @@
   <h2>ULTRA PRECISION DETECTOR</h2>
   <h2>🇿🇼 Zimbabwe Time: <span id="zimTime">--:--:--</span></h2>
 
-  <button class="btn" onclick="generatePowerSignal()">GENERATE POWER SIGNAL</button>
-  <div id="status" class="status">Awaiting powerful signal... Precision detection in progress</div>
+  <div id="authSection">
+    <input type="text" id="accessCode" placeholder="Enter access code" />
+    <button class="btn" onclick="unlockBot()">Unlock Bot</button>
+    <div id="authStatus" class="status">🔐 Protected — enter code to activate</div>
+  </div>
 
-  <div id="signalContainer"></div>
+  <div id="mainApp" style="display:none;">
+    <button class="btn" onclick="generatePowerSignal()">GENERATE POWER SIGNAL</button>
+    <div id="status" class="status">Awaiting powerful signal... Precision detection in progress</div>
+    <div id="signalContainer"></div>
+  </div>
 
   <div class="footer">
     Advanced Algorithm | Real-time Analysis | Maximum Precision<br>
@@ -84,6 +99,17 @@
     setInterval(updateTime, 1000);
     updateTime();
 
+    function unlockBot() {
+      const code = document.getElementById("accessCode").value.trim();
+      if (code === "crusheraccess2025") {
+        document.getElementById("authSection").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+        document.getElementById("authStatus").textContent = "";
+      } else {
+        document.getElementById("authStatus").textContent = "❌ Invalid code. Request access from Dope.";
+      }
+    }
+
     function generatePowerSignal() {
       const now = new Date();
       const delay = Math.floor(Math.random() * 60) + 60; // 60–120s
@@ -93,10 +119,44 @@
       const ss = String(signalTime.getSeconds()).padStart(2, '0');
       const timeStr = `${hh}:${mm}:${ss}`;
 
-      // Simulated real data logic
       const recentRounds = [1.01, 1.03, 1.02, 1.04, 1.01];
       const volatility = recentRounds.filter(x => x < 2.0).length / recentRounds.length;
       const riskLevel = volatility > 0.8 ? "⚠️ High Crash Risk" : "✅ Stable";
 
       const multiplier = (volatility > 0.8)
-        ?
+        ? (Math.random() * 2 + 1).toFixed(1)
+        : (Math.random() * 4 + 3).toFixed(1);
+
+      const confidence = volatility > 0.8
+        ? Math.floor(85 + Math.random() * 5)
+        : Math.floor(90 + Math.random() * 9);
+
+      const box = document.createElement("div");
+      box.className = "signal-box";
+      box.innerHTML = `
+        <strong>POWER SIGNAL</strong><br>
+        Confidence: <span style="color:#00ffcc">${confidence}%</span><br>
+        Time: <span style="color:#00ffcc">${timeStr}</span><br>
+        Multiplier: <span style="color:#00ffcc">${multiplier}X</span><br>
+        Countdown: <span id="countdown">${delay}s</span><br>
+        Risk Level: ${riskLevel}
+      `;
+      document.getElementById("signalContainer").innerHTML = "";
+      document.getElementById("signalContainer").appendChild(box);
+      document.getElementById("status").textContent = "✅ Signal generated. Prepare for entry.";
+
+      let countdown = delay;
+      const countdownEl = document.getElementById("countdown");
+      const interval = setInterval(() => {
+        countdown--;
+        countdownEl.textContent = `${countdown}s`;
+        if (countdown <= 0) {
+          clearInterval(interval);
+          document.getElementById("status").textContent = "⚠️ Signal active now!";
+        }
+      }, 1000);
+    }
+  </script>
+
+</body>
+</html>
