@@ -10,23 +10,31 @@ const scrapeCrash = async () => {
       headless: true,
       args: ['--no-sandbox']
     });
+
     const page = await browser.newPage();
     await page.goto('https://games.africabet.com/LaunchG', { waitUntil: 'networkidle2' });
 
-    await page.waitForSelector('.multiplier'); // Confirm selector via Inspect
+    // Wait for the crash multiplier to appear
+    await page.waitForSelector('.multiplier'); // Confirm this selector via Inspect
     const crash = await page.$eval('.multiplier', el => el.textContent.trim());
 
     latestCrash = crash;
     await browser.close();
   } catch (err) {
     console.error('Scrape error:', err);
+    latestCrash = "Error";
   }
 };
 
+// Scrape every 30 seconds
 setInterval(scrapeCrash, 30000);
 
+// Serve the latest crash point
 app.get('/', (req, res) => {
   res.json({ crashPoint: latestCrash });
 });
 
-app.listen(process.env.PORT || 3000);
+// Start the server
+app.listen(process.env.PORT || 3000, () => {
+  console.log('MR CRUSHER backend running...');
+});
