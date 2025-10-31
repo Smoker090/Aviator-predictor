@@ -13,7 +13,7 @@ const scrapeCrash = async () => {
     const page = await browser.newPage();
     await page.goto('https://games.africabet.com/LaunchG', { waitUntil: 'networkidle2' });
 
-    await page.waitForSelector('.multiplier'); // Confirm this selector via Inspect
+    await page.waitForSelector('.multiplier'); // Confirm selector via Inspect
     const crash = await page.$eval('.multiplier', el => el.textContent.trim());
 
     latestCrash = crash;
