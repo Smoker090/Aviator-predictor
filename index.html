@@ -10,20 +10,21 @@
       color: #00ffff;
       text-align: center;
       padding: 40px;
+      margin: 0;
     }
     h1 {
       color: #ff00cc;
       font-size: 2em;
       margin-bottom: 20px;
     }
-    input[type="password"], button {
+    input, button {
       padding: 10px;
       font-size: 16px;
       margin: 10px;
       border-radius: 5px;
       border: none;
     }
-    input[type="password"] {
+    input {
       width: 60%;
       background: #111;
       color: #fff;
@@ -34,8 +35,9 @@
       font-weight: bold;
       cursor: pointer;
     }
-    .hidden {
-      display: none;
+    #gate, #signalBox {
+      max-width: 400px;
+      margin: auto;
     }
     #signalBox {
       margin-top: 30px;
@@ -43,6 +45,7 @@
       border: 2px solid #00ffff;
       border-radius: 10px;
       padding: 20px;
+      display: none;
     }
     .label {
       color: #ccc;
@@ -66,12 +69,61 @@
   <div id="gate">
     <p class="label">Enter Access Code:</p>
     <input type="password" id="codeInput" placeholder="Enter password" />
-    <button id="unlockBtn">Unlock Signal</button>
+    <button onclick="checkCode()">Unlock Signal</button>
     <p id="error"></p>
   </div>
 
-  <div id="signalBox" class="hidden">
+  <div id="signalBox">
     <p class="label">Live Crash Signal:</p>
     <p>Multiplier: <span id="multiplier" class="value">Loading...</span></p>
     <p>Confidence: <span id="confidence" class="value">...</span></p>
-    <p>Risk Level: <span id="risk" class="value">
+    <p>Risk Level: <span id="risk" class="value">...</span></p>
+  </div>
+
+  <script>
+    const backendURL = "https://aviator-predictor-production-2b20.up.railway.app/";
+
+    function checkCode() {
+      const input = document.getElementById("codeInput").value.trim();
+      if (input === "mrcrusher2026") {
+        document.getElementById("gate").style.display = "none";
+        document.getElementById("signalBox").style.display = "block";
+        fetchSignal();
+        setInterval(fetchSignal, 30000);
+      } else {
+        document.getElementById("error").textContent = "Incorrect code. Try again.";
+      }
+    }
+
+    function fetchSignal() {
+      fetch(backendURL)
+        .then(res => res.json())
+        .then(data => {
+          const crash = data.crashPoint || "N/A";
+          document.getElementById("multiplier").textContent = crash;
+          document.getElementById("confidence").textContent = "Live";
+
+          const riskEl = document.getElementById("risk");
+          const crashNum = parseFloat(crash);
+          if (!isNaN(crashNum)) {
+            if (crashNum < 1.5) {
+              riskEl.textContent = "High";
+              riskEl.className = "value risk-high";
+            } else {
+              riskEl.textContent = "Low";
+              riskEl.className = "value risk-low";
+            }
+          } else {
+            riskEl.textContent = "...";
+            riskEl.className = "value";
+          }
+        })
+        .catch(err => {
+          document.getElementById("multiplier").textContent = "Error";
+          document.getElementById("confidence").textContent = "Offline";
+          document.getElementById("risk").textContent = "Unknown";
+        });
+    }
+  </script>
+</body>
+</html>
