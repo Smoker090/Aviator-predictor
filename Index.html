@@ -1,131 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MR CRUSHER PRO – GitHub Edition</title>
+  <title>MR CRUSHER EMPIRE</title>
   <style>
-    body {
-      background: linear-gradient(to bottom right, #1a0033, #330033);
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    .container {
-      max-width: 400px;
-      margin: auto;
-      background: #2a0044;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px #ff00cc;
-    }
-    h1 {
-      color: #ff00cc;
-    }
-    input[type="password"] {
-      padding: 10px;
-      width: 80%;
-      margin-bottom: 10px;
-      border: none;
-      border-radius: 5px;
-    }
-    button {
-      padding: 10px 20px;
-      background: #ff00cc;
-      border: none;
-      border-radius: 5px;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .hidden {
-      display: none;
-    }
-    .signal-box {
-      margin-top: 20px;
-      background: #400060;
-      padding: 15px;
-      border-radius: 10px;
-    }
-    .footer {
-      margin-top: 20px;
-      font-size: 0.9em;
-      color: #ccc;
-    }
-    a {
-      color: #00ffff;
-      text-decoration: none;
-    }
+    body { font-family: Arial; text-align: center; padding: 50px; background: #111; color: #fff; }
+    .hidden { display: none; }
+    input, button { padding: 10px; font-size: 16px; }
+    #signalBox { margin-top: 30px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>MR CRUSHER PRO</h1>
-    <p>Enter Access Code:</p>
-    <input type="password" id="accessCode" placeholder="Enter password" />
-    <button onclick="checkAccess()">Unlock</button>
+  <h1>MR CRUSHER EMPIRE</h1>
 
-    <div id="signalArea" class="hidden">
-      <div class="signal-box">
-        <h2>📡 Predicted Signal</h2>
-        <p>🎯 Next Multiplier: <strong id="multiplier">Loading...</strong></p>
-        <p>📊 Confidence: <strong id="confidence">Loading...</strong></p>
-        <p>⚡ Risk Level: <strong id="risk">Loading...</strong></p>
-        <p>⏳ Countdown: <span id="countdown">30s</span></p>
-      </div>
-      <div class="footer">
-        💸 Play Aviator → <a href="https://www.africabet.com/?ref=14346988">Join Now</a><br />
-        📲 <a href="https://wa.me/263771234567">WhatsApp</a> | <a href="https://t.me/yourgroup">Telegram</a><br />
-        Bot refreshes every 30s. Use wisely.
-      </div>
-    </div>
+  <div id="gate">
+    <p>Enter Access Code:</p>
+    <input type="password" id="codeInput" placeholder="Enter password" />
+    <button onclick="checkCode()">Unlock</button>
+    <p id="error" style="color:red;"></p>
+  </div>
+
+  <div id="signalBox" class="hidden">
+    <h2>Live Crash Signal</h2>
+    <p>Multiplier: <span id="multiplier">Loading...</span></p>
+    <p>Confidence: <span id="confidence">...</span></p>
+    <p>Risk Level: <span id="risk">...</span></p>
   </div>
 
   <script>
-    const crashHistory = ["1.01", "1.03", "1.09", "1.34", "3.76", "1.67", "1.79", "18.41", "5.6", "8.47"];
-    let countdown = 30;
-    let interval;
+    const backendURL = "https://aviator-predictor-production-2b20.up.railway.app/";
 
-    function checkAccess() {
-      const code = document.getElementById("accessCode").value;
-      if (code === "crusheraccess2025") {
-        document.getElementById("signalArea").classList.remove("hidden");
-        generateSignal();
-        startCountdown();
+    function checkCode() {
+      const input = document.getElementById("codeInput").value;
+      if (input === "mrcrusher2026") {
+        document.getElementById("gate").classList.add("hidden");
+        document.getElementById("signalBox").classList.remove("hidden");
+        fetchSignal();
+        setInterval(fetchSignal, 30000);
       } else {
-        alert("Incorrect password.");
+        document.getElementById("error").textContent = "Incorrect code. Try again.";
       }
     }
 
-    function generateSignal() {
-      const recent = crashHistory.slice(0, 5).map(x => parseFloat(x));
-      const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
-      const last = parseFloat(crashHistory[0]);
-
-      let risk = (last < 1.5 && avg < 2.0) ? "High" : "Low";
-      let nextMultiplier = (risk === "High") ? "1.20x" : "2.80x";
-      let confidence = Math.floor(Math.random() * 10 + 90) + "%";
-
-      document.getElementById("multiplier").textContent = nextMultiplier;
-      document.getElementById("confidence").textContent = confidence;
-      document.getElementById("risk").textContent = risk;
-
-      // Simulate new crash point
-      const newCrash = (Math.random() * 10).toFixed(2);
-      crashHistory.unshift(newCrash);
-      crashHistory.pop();
-    }
-
-    function startCountdown() {
-      interval = setInterval(() => {
-        countdown--;
-        document.getElementById("countdown").textContent = countdown + "s";
-        if (countdown <= 0) {
-          countdown = 30;
-          generateSignal();
-        }
-      }, 1000);
+    function fetchSignal() {
+      fetch(backendURL)
+        .then(res => res.json())
+        .then(data => {
+          const crash = data.crashPoint || "N/A";
+          document.getElementById("multiplier").textContent = crash;
+          document.getElementById("confidence").textContent = "Live";
+          document.getElementById("risk").textContent = parseFloat(crash) < 1.5 ? "High" : "Low";
+        });
     }
   </script>
 </body>
