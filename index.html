@@ -1,56 +1,41 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>MR CRUSHER EMPIRE</title>
-  <style>
-    body { font-family: Arial; text-align: center; padding: 50px; background: #111; color: #fff; }
-    .hidden { display: none; }
-    input, button { padding: 10px; font-size: 16px; }
-    #signalBox { margin-top: 30px; }
-  </style>
-</head>
-<body>
-  <h1>MR CRUSHER EMPIRE</h1>
+const puppeteer = require('puppeteer');
+const express = require('express');
+const cors = require('cors');
+const app = express();
 
-  <div id="gate">
-    <p>Enter Access Code:</p>
-    <input type="password" id="codeInput" placeholder="Enter password" />
-    <button onclick="checkCode()">Unlock</button>
-    <p id="error" style="color:red;"></p>
-  </div>
+app.use(cors());
 
-  <div id="signalBox" class="hidden">
-    <h2>Live Crash Signal</h2>
-    <p>Multiplier: <span id="multiplier">Loading...</span></p>
-    <p>Confidence: <span id="confidence">...</span></p>
-    <p>Risk Level: <span id="risk">...</span></p>
-  </div>
+let latestCrash = "Loading...";
 
-  <script>
-    const backendURL = "https://aviator-predictor-production-2b20.up.railway.app/";
+const scrapeCrash = async () => {
+  try {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox']
+    });
 
-    function checkCode() {
-      const input = document.getElementById("codeInput").value;
-      if (input === "mrcrusher2026") {
-        document.getElementById("gate").classList.add("hidden");
-        document.getElementById("signalBox").classList.remove("hidden");
-        fetchSignal();
-        setInterval(fetchSignal, 30000);
-      } else {
-        document.getElementById("error").textContent = "Incorrect code. Try again.";
-      }
-    }
+    const page = await browser.newPage();
+    await page.goto('https://games.africabet.com/LaunchG', { waitUntil: 'networkidle2' });
 
-    function fetchSignal() {
-      fetch(backendURL)
-        .then(res => res.json())
-        .then(data => {
-          const crash = data.crashPoint || "N/A";
-          document.getElementById("multiplier").textContent = crash;
-          document.getElementById("confidence").textContent = "Live";
-          document.getElementById("risk").textContent = parseFloat(crash) < 1.5 ? "High" : "Low";
-        });
-    }
-  </script>
-</body>
-</html>
+    // Try multiple selectors to match the live multiplier
+    await page.waitForSelector('.multiplier, .live-value, .crash-point', { timeout: 10000 });
+    const crash = await page.$eval('.multiplier, .live-value, .crash-point', el => el.textContent.trim());
+
+    latestCrash = crash;
+    console.log("Scraped crash:", crash);
+    await browser.close();
+  } catch (err) {
+    console.error("Scrape error:", err);
+    latestCrash = "Error";
+  }
+};
+
+setInterval(scrapeCrash, 30000);
+
+app.get('/', (req, res) => {
+  res.json({ crashPoint: latestCrash });
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log('MR CRUSHER backend running...');
+});
