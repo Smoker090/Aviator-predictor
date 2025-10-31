@@ -3,97 +3,130 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KADIKI KACHO - Aviator Signals</title>
+  <title>MR CRUSHER PRO – GitHub Edition</title>
   <style>
     body {
-      background-color: #000;
+      background: linear-gradient(to bottom right, #1a0033, #330033);
       color: #fff;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
       padding: 20px;
     }
-    h1 {
-      font-size: 28px;
-      color: #ff00cc;
-      margin-bottom: 5px;
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: #2a0044;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #ff00cc;
     }
-    h2 {
-      font-size: 18px;
-      color: #ccc;
-      margin-bottom: 20px;
+    h1 {
+      color: #ff00cc;
+    }
+    input[type="password"] {
+      padding: 10px;
+      width: 80%;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #ff00cc;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
     }
     .signal-box {
-      background-color: #1a1a1a;
-      border: 2px solid #ff00cc;
-      border-radius: 10px;
+      margin-top: 20px;
+      background: #400060;
       padding: 15px;
-      margin: 10px auto;
-      width: 90%;
-      font-size: 18px;
-      color: #fff;
-    }
-    .btn {
-      background-color: #ff00cc;
-      color: #fff;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 10px;
+      border-radius: 10px;
     }
     .footer {
-      margin-top: 30px;
-      font-size: 14px;
-      color: #aaa;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #ccc;
     }
-    .flag {
-      font-size: 18px;
-      margin-left: 5px;
+    a {
+      color: #00ffff;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>MR CRUSHER PRO</h1>
+    <p>Enter Access Code:</p>
+    <input type="password" id="accessCode" placeholder="Enter password" />
+    <button onclick="checkAccess()">Unlock</button>
 
-  <h1>⚡ KADIKI KACHO ⚡</h1>
-  <h2>Zimbabwe Time: <span id="zimTime">--:--</span> <span class="flag">🇿🇼</span></h2>
-
-  <button class="btn" onclick="generateSignals()">Generate 5 Signals</button>
-
-  <div id="signalContainer"></div>
-
-  <div class="footer">
-    Powered by Dope Signals | Contact: 0773542286
+    <div id="signalArea" class="hidden">
+      <div class="signal-box">
+        <h2>📡 Predicted Signal</h2>
+        <p>🎯 Next Multiplier: <strong id="multiplier">Loading...</strong></p>
+        <p>📊 Confidence: <strong id="confidence">Loading...</strong></p>
+        <p>⚡ Risk Level: <strong id="risk">Loading...</strong></p>
+        <p>⏳ Countdown: <span id="countdown">30s</span></p>
+      </div>
+      <div class="footer">
+        💸 Play Aviator → <a href="https://www.africabet.com/?ref=14346988">Join Now</a><br />
+        📲 <a href="https://wa.me/263771234567">WhatsApp</a> | <a href="https://t.me/yourgroup">Telegram</a><br />
+        Bot refreshes every 30s. Use wisely.
+      </div>
+    </div>
   </div>
 
   <script>
-    function updateTime() {
-      const now = new Date();
-      const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Africa/Harare' };
-      const timeStr = now.toLocaleTimeString('en-GB', options);
-      document.getElementById("zimTime").textContent = timeStr;
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
+    const crashHistory = ["1.01", "1.03", "1.09", "1.34", "3.76", "1.67", "1.79", "18.41", "5.6", "8.47"];
+    let countdown = 30;
+    let interval;
 
-    function generateSignals() {
-      const container = document.getElementById("signalContainer");
-      container.innerHTML = "";
-      const now = new Date();
-      for (let i = 1; i <= 5; i++) {
-        const signalTime = new Date(now.getTime() + i * 1000); // 1 sec apart
-        const hh = String(signalTime.getHours()).padStart(2, '0');
-        const mm = String(signalTime.getMinutes()).padStart(2, '0');
-        const ss = String(signalTime.getSeconds()).padStart(2, '0');
-        const timeStr = `${hh}:${mm}:${ss}`;
-        const multiplier = (Math.random() * 5 + 2).toFixed(1); // 2.0X to 7.0X
-        const box = document.createElement("div");
-        box.className = "signal-box";
-        box.innerHTML = `🚀 Signal ${i}: <strong>${timeStr}</strong> — <span style="color:#00ffcc">${multiplier}X</span>`;
-        container.appendChild(box);
+    function checkAccess() {
+      const code = document.getElementById("accessCode").value;
+      if (code === "crusheraccess2025") {
+        document.getElementById("signalArea").classList.remove("hidden");
+        generateSignal();
+        startCountdown();
+      } else {
+        alert("Incorrect password.");
       }
     }
-  </script>
 
+    function generateSignal() {
+      const recent = crashHistory.slice(0, 5).map(x => parseFloat(x));
+      const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
+      const last = parseFloat(crashHistory[0]);
+
+      let risk = (last < 1.5 && avg < 2.0) ? "High" : "Low";
+      let nextMultiplier = (risk === "High") ? "1.20x" : "2.80x";
+      let confidence = Math.floor(Math.random() * 10 + 90) + "%";
+
+      document.getElementById("multiplier").textContent = nextMultiplier;
+      document.getElementById("confidence").textContent = confidence;
+      document.getElementById("risk").textContent = risk;
+
+      // Simulate new crash point
+      const newCrash = (Math.random() * 10).toFixed(2);
+      crashHistory.unshift(newCrash);
+      crashHistory.pop();
+    }
+
+    function startCountdown() {
+      interval = setInterval(() => {
+        countdown--;
+        document.getElementById("countdown").textContent = countdown + "s";
+        if (countdown <= 0) {
+          countdown = 30;
+          generateSignal();
+        }
+      }, 1000);
+    }
+  </script>
 </body>
 </html>
