@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>MR CRUSHER EMPIRE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -65,7 +66,7 @@
   <div id="gate">
     <p class="label">Enter Access Code:</p>
     <input type="password" id="codeInput" placeholder="Enter password" />
-    <button onclick="checkCode()">Unlock Signal</button>
+    <button id="unlockBtn">Unlock Signal</button>
     <p id="error"></p>
   </div>
 
@@ -73,31 +74,4 @@
     <p class="label">Live Crash Signal:</p>
     <p>Multiplier: <span id="multiplier" class="value">Loading...</span></p>
     <p>Confidence: <span id="confidence" class="value">...</span></p>
-    <p>Risk Level: <span id="risk" class="value">...</span></p>
-  </div>
-
-  <script>
-    const backendURL = "https://aviator-predictor-production-2b20.up.railway.app/";
-
-    function checkCode() {
-      const input = document.getElementById("codeInput").value;
-      if (input === "mrcrusher2026") {
-        document.getElementById("gate").classList.add("hidden");
-        document.getElementById("signalBox").classList.remove("hidden");
-        fetchSignal();
-        setInterval(fetchSignal, 30000);
-      } else {
-        document.getElementById("error").textContent = "Incorrect code. Try again.";
-      }
-    }
-
-    function fetchSignal() {
-      fetch(backendURL)
-        .then(res => res.json())
-        .then(data => {
-          const crash = data.crashPoint || "N/A";
-          document.getElementById("multiplier").textContent = crash;
-          document.getElementById("confidence").textContent = "Live";
-
-          const riskEl = document.getElementById("risk");
-          const crashNum = parse
+    <p>Risk Level: <span id="risk" class="value">
