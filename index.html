@@ -3,160 +3,130 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MR CRUSHER PRO – Ultra Precision Detector</title>
+  <title>MR CRUSHER PRO – GitHub Edition</title>
   <style>
     body {
-      background: radial-gradient(circle at center, #330044, #1a0026);
+      background: linear-gradient(to bottom right, #1a0033, #330033);
       color: #fff;
       font-family: 'Segoe UI', sans-serif;
       text-align: center;
       padding: 20px;
     }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: #2a0044;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #ff00cc;
+    }
     h1 {
-      font-size: 28px;
       color: #ff00cc;
-      margin-bottom: 5px;
     }
-    h2 {
-      font-size: 16px;
-      color: #ccc;
-      margin-bottom: 20px;
-    }
-    .btn {
-      background-color: #ff00cc;
-      color: #fff;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    input {
+    input[type="password"] {
       padding: 10px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: none;
       width: 80%;
-      margin-top: 10px;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #ff00cc;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
     }
     .signal-box {
-      background-color: #2a0033;
-      border: 2px solid #ff00cc;
-      border-radius: 10px;
+      margin-top: 20px;
+      background: #400060;
       padding: 15px;
-      margin: 15px auto;
-      width: 90%;
-      font-size: 18px;
-      color: #fff;
+      border-radius: 10px;
     }
     .footer {
-      margin-top: 30px;
-      font-size: 14px;
-      color: #aaa;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #ccc;
     }
-    .flag {
-      font-size: 18px;
-      margin-left: 5px;
-    }
-    .status {
-      font-size: 16px;
-      color: #00ffcc;
-      margin-top: 10px;
+    a {
+      color: #00ffff;
+      text-decoration: none;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>MR CRUSHER PRO</h1>
+    <p>Enter Access Code:</p>
+    <input type="password" id="accessCode" placeholder="Enter password" />
+    <button onclick="checkAccess()">Unlock</button>
 
-  <h1>⚡ MR CRUSHER PRO ⚡</h1>
-  <h2>ULTRA PRECISION DETECTOR</h2>
-  <h2>🇿🇼 Zimbabwe Time: <span id="zimTime">--:--:--</span></h2>
-
-  <div id="authSection">
-    <input type="text" id="accessCode" placeholder="Enter access code" />
-    <button class="btn" onclick="unlockBot()">Unlock Bot</button>
-    <div id="authStatus" class="status">🔐 Protected — enter code to activate</div>
-  </div>
-
-  <div id="mainApp" style="display:none;">
-    <button class="btn" onclick="generatePowerSignal()">GENERATE POWER SIGNAL</button>
-    <div id="status" class="status">Awaiting powerful signal... Precision detection in progress</div>
-    <div id="signalContainer"></div>
-  </div>
-
-  <div class="footer">
-    Advanced Algorithm | Real-time Analysis | Maximum Precision<br>
-    Bot expires on <strong>17 October</strong>. Use wisely.
+    <div id="signalArea" class="hidden">
+      <div class="signal-box">
+        <h2>📡 Predicted Signal</h2>
+        <p>🎯 Next Multiplier: <strong id="multiplier">Loading...</strong></p>
+        <p>📊 Confidence: <strong id="confidence">Loading...</strong></p>
+        <p>⚡ Risk Level: <strong id="risk">Loading...</strong></p>
+        <p>⏳ Countdown: <span id="countdown">30s</span></p>
+      </div>
+      <div class="footer">
+        💸 Play Aviator → <a href="https://www.africabet.com/?ref=14346988">Join Now</a><br />
+        📲 <a href="https://wa.me/263771234567">WhatsApp</a> | <a href="https://t.me/yourgroup">Telegram</a><br />
+        Bot refreshes every 30s. Use wisely.
+      </div>
+    </div>
   </div>
 
   <script>
-    function updateTime() {
-      const now = new Date();
-      const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Africa/Harare' };
-      const timeStr = now.toLocaleTimeString('en-GB', options);
-      document.getElementById("zimTime").textContent = timeStr;
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
+    const crashHistory = ["1.01", "1.03", "1.09", "1.34", "3.76", "1.67", "1.79", "18.41", "5.6", "8.47"];
+    let countdown = 30;
+    let interval;
 
-    function unlockBot() {
-      const code = document.getElementById("accessCode").value.trim();
+    function checkAccess() {
+      const code = document.getElementById("accessCode").value;
       if (code === "crusheraccess2025") {
-        document.getElementById("authSection").style.display = "none";
-        document.getElementById("mainApp").style.display = "block";
-        document.getElementById("authStatus").textContent = "";
+        document.getElementById("signalArea").classList.remove("hidden");
+        generateSignal();
+        startCountdown();
       } else {
-        document.getElementById("authStatus").textContent = "❌ Invalid code. Request access from Dope.";
+        alert("Incorrect password.");
       }
     }
 
-    function generatePowerSignal() {
-      const now = new Date();
-      const delay = Math.floor(Math.random() * 60) + 60; // 60–120s
-      const signalTime = new Date(now.getTime() + delay * 1000);
-      const hh = String(signalTime.getHours()).padStart(2, '0');
-      const mm = String(signalTime.getMinutes()).padStart(2, '0');
-      const ss = String(signalTime.getSeconds()).padStart(2, '0');
-      const timeStr = `${hh}:${mm}:${ss}`;
+    function generateSignal() {
+      const recent = crashHistory.slice(0, 5).map(x => parseFloat(x));
+      const avg = recent.reduce((a, b) => a + b, 0) / recent.length;
+      const last = parseFloat(crashHistory[0]);
 
-      const recentRounds = [1.01, 1.03, 1.02, 1.04, 1.01];
-      const volatility = recentRounds.filter(x => x < 2.0).length / recentRounds.length;
-      const riskLevel = volatility > 0.8 ? "⚠️ High Crash Risk" : "✅ Stable";
+      let risk = (last < 1.5 && avg < 2.0) ? "High" : "Low";
+      let nextMultiplier = (risk === "High") ? "1.20x" : "2.80x";
+      let confidence = Math.floor(Math.random() * 10 + 90) + "%";
 
-      const multiplier = (volatility > 0.8)
-        ? (Math.random() * 2 + 1).toFixed(1)
-        : (Math.random() * 4 + 3).toFixed(1);
+      document.getElementById("multiplier").textContent = nextMultiplier;
+      document.getElementById("confidence").textContent = confidence;
+      document.getElementById("risk").textContent = risk;
 
-      const confidence = volatility > 0.8
-        ? Math.floor(85 + Math.random() * 5)
-        : Math.floor(90 + Math.random() * 9);
+      // Simulate new crash point
+      const newCrash = (Math.random() * 10).toFixed(2);
+      crashHistory.unshift(newCrash);
+      crashHistory.pop();
+    }
 
-      const box = document.createElement("div");
-      box.className = "signal-box";
-      box.innerHTML = `
-        <strong>POWER SIGNAL</strong><br>
-        Confidence: <span style="color:#00ffcc">${confidence}%</span><br>
-        Time: <span style="color:#00ffcc">${timeStr}</span><br>
-        Multiplier: <span style="color:#00ffcc">${multiplier}X</span><br>
-        Countdown: <span id="countdown">${delay}s</span><br>
-        Risk Level: ${riskLevel}
-      `;
-      document.getElementById("signalContainer").innerHTML = "";
-      document.getElementById("signalContainer").appendChild(box);
-      document.getElementById("status").textContent = "✅ Signal generated. Prepare for entry.";
-
-      let countdown = delay;
-      const countdownEl = document.getElementById("countdown");
-      const interval = setInterval(() => {
+    function startCountdown() {
+      interval = setInterval(() => {
         countdown--;
-        countdownEl.textContent = `${countdown}s`;
+        document.getElementById("countdown").textContent = countdown + "s";
         if (countdown <= 0) {
-          clearInterval(interval);
-          document.getElementById("status").textContent = "⚠️ Signal active now!";
+          countdown = 30;
+          generateSignal();
         }
       }, 1000);
     }
   </script>
-
 </body>
 </html>
