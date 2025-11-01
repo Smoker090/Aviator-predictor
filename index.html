@@ -1,133 +1,123 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>MR CRUSHER PRO</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MR CRUSHER PRO – Community Edition</title>
   <style>
     body {
-      background: #0a001f;
+      background: linear-gradient(to bottom right, #1a0033, #330033);
       color: #fff;
-      font-family: 'Arial', sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      padding: 40px;
+      padding: 20px;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: #2a0044;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #ff00cc;
     }
     h1 {
       color: #ff00cc;
-      font-size: 32px;
     }
-    .section {
-      margin-top: 30px;
-      border: 2px solid #ff00cc;
-      padding: 20px;
-      border-radius: 10px;
+    input[type="password"] {
+      padding: 10px;
+      width: 80%;
+      margin-bottom: 10px;
+      border: none;
+      border-radius: 5px;
     }
     button {
+      padding: 10px 20px;
       background: #ff00cc;
-      color: #fff;
       border: none;
-      padding: 12px 24px;
-      font-size: 18px;
-      border-radius: 8px;
+      border-radius: 5px;
+      color: #fff;
+      font-weight: bold;
       cursor: pointer;
     }
-    .label {
-      font-weight: bold;
+    .hidden {
+      display: none;
+    }
+    .signal-box {
+      margin-top: 20px;
+      background: #400060;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 0.9em;
       color: #ccc;
     }
-    .value {
-      font-size: 24px;
-      color: #00ffcc;
+    a {
+      color: #00ffff;
+      text-decoration: none;
     }
-    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <h1>⚡ MR CRUSHER PRO ⚡<br>Ultra Precision Detector</h1>
+  <div class="container">
+    <h1>MR CRUSHER PRO</h1>
+    <p>Enter Access Code:</p>
+    <input type="password" id="accessCode" placeholder="Enter password" />
+    <button onclick="checkAccess()">Unlock</button>
 
-  <div id="gate" class="section">
-    <p class="label">🔐 Enter VIP Access Code:</p>
-    <input type="password" id="codeInput" placeholder="Enter password" />
-    <button id="unlockBtn">Unlock VIP Mode</button>
-    <p id="error" style="color:red;"></p>
-  </div>
-
-  <div id="vipPanel" class="section hidden">
-    <p class="label">🌍 Country:</p>
-    <p class="value">Zimbabwe</p>
-    <p class="label">🕒 Local Time:</p>
-    <p class="value" id="localTime">--:--:--</p>
-    <button onclick="generateVIP()">GENERATE POWER SIGNALS</button>
-  </div>
-
-  <div id="signals" class="section hidden">
-    <p class="label">🔴 VIP POWER SIGNALS</p>
-    <div id="output"></div>
+    <div id="signalArea" class="hidden">
+      <div class="signal-box">
+        <h2>🔮 Signal Mode: <span id="mode">Standard</span></h2>
+        <p>🎯 Predicted Multiplier: <strong id="multiplier">3.2x</strong></p>
+        <p>📉 Confidence Level: <strong id="confidence">91%</strong></p>
+        <p>⚡ Risk Level: <strong id="risk">Low</strong></p>
+        <p>⏳ Countdown: <span id="countdown">15s</span></p>
+        <button onclick="toggleMode()">Switch Mode</button>
+      </div>
+      <div class="footer">
+        💸 Play Aviator → <a href="https://your-affiliate-link">Join Now</a><br />
+        📲 <a href="https://wa.me/263771234567">WhatsApp</a> | <a href="https://t.me/yourgroup">Telegram</a><br />
+        Bot expires on <strong>17 October</strong>. Use wisely.
+      </div>
+    </div>
   </div>
 
   <script>
-    function updateTime() {
-      const now = new Date();
-      document.getElementById("localTime").textContent = now.toLocaleTimeString();
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
+    let mode = "Standard";
+    let countdown = 15;
+    let interval;
 
-    function getWeeklyPassword() {
-      const now = new Date();
-      const oneJan = new Date(now.getFullYear(), 0, 1);
-      const numberOfDays = Math.floor((now - oneJan) / (24 * 60 * 60 * 1000));
-      const week = Math.ceil((now.getDay() + 1 + numberOfDays) / 7);
-      return `vipcrusher2026-W${week}`;
-    }
-
-    document.getElementById("unlockBtn").addEventListener("click", function () {
-      const input = document.getElementById("codeInput").value;
-      const expected = getWeeklyPassword();
-      if (input === expected) {
-        document.getElementById("gate").classList.add("hidden");
-        document.getElementById("vipPanel").classList.remove("hidden");
+    function checkAccess() {
+      const code = document.getElementById("accessCode").value;
+      if (code === "crusheraccess2025") {
+        document.getElementById("signalArea").classList.remove("hidden");
       } else {
-        document.getElementById("error").textContent = "Incorrect code. Try again.";
-      }
-    });
-
-    function generateVIP() {
-      document.getElementById("signals").classList.remove("hidden");
-      const output = document.getElementById("output");
-      output.innerHTML = "";
-
-      for (let i = 1; i <= 5; i++) {
-        const confidence = Math.floor(Math.random() * 21) + 80;
-        const multiplier = (Math.random() * 4 + 1).toFixed(2);
-        const countdown = Math.floor(Math.random() * 120) + 30;
-        const countdownId = `countdown${i}`;
-
-        const signal = `
-          <p class="value">⚡ Signal ${i}</p>
-          <p class="label">Confidence: <span class="value">${confidence}%</span></p>
-          <p class="label">Multiplier: <span class="value">${multiplier}x</span></p>
-          <p class="label">Countdown: <span class="value" id="${countdownId}">${countdown}s</span></p>
-          <hr style="border-color:#ff00cc;">
-        `;
-        output.innerHTML += signal;
-
-        // Delay countdown start to ensure DOM is ready
-        setTimeout(() => startCountdown(countdownId, countdown), 100);
+        alert("Incorrect password.");
       }
     }
 
-    function startCountdown(id, seconds) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const timer = setInterval(() => {
-        seconds--;
-        el.textContent = seconds + "s";
-        if (seconds <= 0) {
-          el.textContent = "0s";
-          clearInterval(timer);
+    function toggleMode() {
+      mode = mode === "Standard" ? "Power" : "Standard";
+      document.getElementById("mode").textContent = mode;
+      document.getElementById("multiplier").textContent = mode === "Power" ? "7.8x" : "3.2x";
+      document.getElementById("confidence").textContent = mode === "Power" ? "96%" : "91%";
+      document.getElementById("risk").textContent = mode === "Power" ? "Medium" : "Low";
+    }
+
+    function startCountdown() {
+      interval = setInterval(() => {
+        countdown--;
+        document.getElementById("countdown").textContent = countdown + "s";
+        if (countdown <= 0) {
+          clearInterval(interval);
+          countdown = 15;
+          startCountdown();
         }
       }, 1000);
     }
+
+    startCountdown();
   </script>
 </body>
 </html>
