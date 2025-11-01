@@ -1,14 +1,3 @@
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const express = require('express');
-const cors = require('cors');
-const app = express();
-
-puppeteer.use(StealthPlugin());
-app.use(cors());
-
-let latestCrash = "Loading...";
-
 const scrapeCrash = async () => {
   try {
     const browser = await puppeteer.launch({
@@ -19,7 +8,10 @@ const scrapeCrash = async () => {
     const page = await browser.newPage();
     await page.goto('https://games.africabet.com/LaunchG', { waitUntil: 'networkidle2' });
 
-    // Extract all visible multipliers from spans
+    // Wait for any span to load — fallback strategy
+    await page.waitForSelector('span', { timeout: 10000 });
+
+    // Extract all span texts that look like multipliers
     const multipliers = await page.$$eval('span', spans =>
       spans.map(el => el.textContent.trim()).filter(text => /^\d+\.\d+x$/.test(text))
     );
@@ -32,13 +24,3 @@ const scrapeCrash = async () => {
     latestCrash = "Error";
   }
 };
-
-setInterval(scrapeCrash, 30000);
-
-app.get('/', (req, res) => {
-  res.json({ crashPoint: latestCrash });
-});
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log('MR CRUSHER backend running...');
-});
