@@ -19,11 +19,14 @@ const scrapeCrash = async () => {
     const page = await browser.newPage();
     await page.goto('https://games.africabet.com/LaunchG', { waitUntil: 'networkidle2' });
 
-    await page.waitForSelector('.multiplier', { timeout: 10000 });
-    const crash = await page.$eval('.multiplier', el => el.textContent.trim());
+    await page.waitForSelector('.round-history span', { timeout: 10000 });
 
-    latestCrash = crash;
-    console.log("Scraped crash:", crash);
+    const multipliers = await page.$$eval('.round-history span', spans =>
+      spans.map(el => el.textContent.trim()).filter(text => text.includes('x'))
+    );
+
+    latestCrash = multipliers.length > 0 ? multipliers[0] : "Error";
+    console.log("Crash detected:", latestCrash);
     await browser.close();
   } catch (err) {
     console.error("Scrape error:", err.message);
