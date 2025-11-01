@@ -110,12 +110,15 @@
           <hr style="border-color:#ff00cc;">
         `;
         output.innerHTML += signal;
-        startCountdown(countdownId, countdown);
+
+        // Delay countdown start to ensure DOM is ready
+        setTimeout(() => startCountdown(countdownId, countdown), 100);
       }
     }
 
     function startCountdown(id, seconds) {
       const el = document.getElementById(id);
+      if (!el) return;
       const timer = setInterval(() => {
         seconds--;
         el.textContent = seconds + "s";
