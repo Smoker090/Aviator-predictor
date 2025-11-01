@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>MR CRUSHER PRO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <style>
     body {
       background: #0a001f;
@@ -59,48 +60,3 @@
   </div>
 
   <div id="signals" class="section hidden">
-    <p class="label">🔴 VIP POWER SIGNALS</p>
-    <div id="output"></div>
-  </div>
-
-  <script>
-    function updateTime() {
-      const now = new Date();
-      document.getElementById("localTime").textContent = now.toLocaleTimeString();
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
-
-    function checkCode() {
-      const input = document.getElementById("codeInput").value;
-      if (input === "vipcrusher2026") {
-        document.getElementById("gate").classList.add("hidden");
-        document.getElementById("vipPanel").classList.remove("hidden");
-      } else {
-        document.getElementById("error").textContent = "Incorrect code. Try again.";
-      }
-    }
-
-    function generateVIP() {
-      document.getElementById("signals").classList.remove("hidden");
-      const output = document.getElementById("output");
-      output.innerHTML = "";
-
-      for (let i = 1; i <= 5; i++) {
-        const confidence = Math.floor(Math.random() * 21) + 80; // 80–100%
-        const multiplier = (Math.random() * 4 + 1).toFixed(2); // 1.00x–5.00x
-        const countdown = Math.floor(Math.random() * 120) + 30; // 30–150s
-
-        const signal = `
-          <p class="value">⚡ Signal ${i}</p>
-          <p class="label">Confidence: <span class="value">${confidence}%</span></p>
-          <p class="label">Multiplier: <span class="value">${multiplier}x</span></p>
-          <p class="label">Countdown: <span class="value">${countdown}s</span></p>
-          <hr style="border-color:#ff00cc;">
-        `;
-        output.innerHTML += signal;
-      }
-    }
-  </script>
-</body>
-</html>
