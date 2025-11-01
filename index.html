@@ -119,7 +119,10 @@
       const timer = setInterval(() => {
         seconds--;
         el.textContent = seconds + "s";
-        if (seconds <= 0) clearInterval(timer);
+        if (seconds <= 0) {
+          el.textContent = "0s";
+          clearInterval(timer);
+        }
       }, 1000);
     }
   </script>
