@@ -1,128 +1,105 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MR CRUSHER EMPIRE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>MR CRUSHER PRO</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #000;
-      color: #00ffff;
+      background: #0a001f;
+      color: #fff;
+      font-family: 'Arial', sans-serif;
       text-align: center;
       padding: 40px;
-      margin: 0;
     }
     h1 {
       color: #ff00cc;
-      font-size: 2em;
-      margin-bottom: 20px;
+      font-size: 32px;
     }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
-      margin: 10px;
-      border-radius: 5px;
-      border: none;
-    }
-    input {
-      width: 60%;
-      background: #111;
-      color: #fff;
+    .section {
+      margin-top: 30px;
+      border: 2px solid #ff00cc;
+      padding: 20px;
+      border-radius: 10px;
     }
     button {
-      background: #00ffff;
-      color: #000;
-      font-weight: bold;
+      background: #ff00cc;
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      font-size: 18px;
+      border-radius: 8px;
       cursor: pointer;
     }
-    #gate, #signalBox {
-      max-width: 400px;
-      margin: auto;
-    }
-    #signalBox {
-      margin-top: 30px;
-      background: #111;
-      border: 2px solid #00ffff;
-      border-radius: 10px;
-      padding: 20px;
-      display: none;
-    }
     .label {
+      font-weight: bold;
       color: #ccc;
     }
     .value {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #fff;
+      font-size: 24px;
+      color: #00ffcc;
     }
-    .risk-low { color: #00ff00; }
-    .risk-high { color: #ff3300; }
-    #error {
-      color: red;
-      font-weight: bold;
-    }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <h1>MR CRUSHER EMPIRE</h1>
+  <h1>⚡ MR CRUSHER PRO ⚡<br>Ultra Precision Detector</h1>
 
-  <div id="gate">
-    <p class="label">Enter Access Code:</p>
+  <div id="gate" class="section">
+    <p class="label">🔐 Enter VIP Access Code:</p>
     <input type="password" id="codeInput" placeholder="Enter password" />
-    <button onclick="checkCode()">Unlock Signal</button>
-    <p id="error"></p>
+    <button onclick="checkCode()">Unlock VIP Mode</button>
+    <p id="error" style="color:red;"></p>
   </div>
 
-  <div id="signalBox">
-    <p class="label">Live Crash Signal:</p>
-    <p>Multiplier: <span id="multiplier" class="value">Loading...</span></p>
-    <p>Confidence: <span id="confidence" class="value">...</span></p>
-    <p>Risk Level: <span id="risk" class="value">...</span></p>
+  <div id="vipPanel" class="section hidden">
+    <p class="label">🌍 Country:</p>
+    <p class="value">Zimbabwe</p>
+    <p class="label">🕒 Local Time:</p>
+    <p class="value" id="localTime">--:--:--</p>
+    <button onclick="generateVIP()">GENERATE POWER SIGNALS</button>
+  </div>
+
+  <div id="signals" class="section hidden">
+    <p class="label">🔴 VIP POWER SIGNALS</p>
+    <div id="output"></div>
   </div>
 
   <script>
-    const backendURL = "https://aviator-predictor-production-2b20.up.railway.app/";
+    function updateTime() {
+      const now = new Date();
+      document.getElementById("localTime").textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
 
     function checkCode() {
-      const input = document.getElementById("codeInput").value.trim();
-      if (input === "mrcrusher2026") {
-        document.getElementById("gate").style.display = "none";
-        document.getElementById("signalBox").style.display = "block";
-        fetchSignal();
-        setInterval(fetchSignal, 30000);
+      const input = document.getElementById("codeInput").value;
+      if (input === "vipcrusher2026") {
+        document.getElementById("gate").classList.add("hidden");
+        document.getElementById("vipPanel").classList.remove("hidden");
       } else {
         document.getElementById("error").textContent = "Incorrect code. Try again.";
       }
     }
 
-    function fetchSignal() {
-      fetch(backendURL)
-        .then(res => res.json())
-        .then(data => {
-          const crash = data.crashPoint || "N/A";
-          document.getElementById("multiplier").textContent = crash;
-          document.getElementById("confidence").textContent = "Live";
+    function generateVIP() {
+      document.getElementById("signals").classList.remove("hidden");
+      const output = document.getElementById("output");
+      output.innerHTML = "";
 
-          const riskEl = document.getElementById("risk");
-          const crashNum = parseFloat(crash);
-          if (!isNaN(crashNum)) {
-            if (crashNum < 1.5) {
-              riskEl.textContent = "High";
-              riskEl.className = "value risk-high";
-            } else {
-              riskEl.textContent = "Low";
-              riskEl.className = "value risk-low";
-            }
-          } else {
-            riskEl.textContent = "...";
-            riskEl.className = "value";
-          }
-        })
-        .catch(err => {
-          document.getElementById("multiplier").textContent = "Error";
-          document.getElementById("confidence").textContent = "Offline";
-          document.getElementById("risk").textContent = "Unknown";
-        });
+      for (let i = 1; i <= 5; i++) {
+        const confidence = Math.floor(Math.random() * 21) + 80; // 80–100%
+        const multiplier = (Math.random() * 4 + 1).toFixed(2); // 1.00x–5.00x
+        const countdown = Math.floor(Math.random() * 120) + 30; // 30–150s
+
+        const signal = `
+          <p class="value">⚡ Signal ${i}</p>
+          <p class="label">Confidence: <span class="value">${confidence}%</span></p>
+          <p class="label">Multiplier: <span class="value">${multiplier}x</span></p>
+          <p class="label">Countdown: <span class="value">${countdown}s</span></p>
+          <hr style="border-color:#ff00cc;">
+        `;
+        output.innerHTML += signal;
+      }
     }
   </script>
 </body>
