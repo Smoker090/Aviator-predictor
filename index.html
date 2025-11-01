@@ -47,7 +47,7 @@
   <div id="gate" class="section">
     <p class="label">🔐 Enter VIP Access Code:</p>
     <input type="password" id="codeInput" placeholder="Enter password" />
-    <button onclick="checkCode()">Unlock VIP Mode</button>
+    <button id="unlockBtn">Unlock VIP Mode</button>
     <p id="error" style="color:red;"></p>
   </div>
 
@@ -60,3 +60,68 @@
   </div>
 
   <div id="signals" class="section hidden">
+    <p class="label">🔴 VIP POWER SIGNALS</p>
+    <div id="output"></div>
+  </div>
+
+  <script>
+    function updateTime() {
+      const now = new Date();
+      document.getElementById("localTime").textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();
+
+    function getWeeklyPassword() {
+      const now = new Date();
+      const oneJan = new Date(now.getFullYear(), 0, 1);
+      const numberOfDays = Math.floor((now - oneJan) / (24 * 60 * 60 * 1000));
+      const week = Math.ceil((now.getDay() + 1 + numberOfDays) / 7);
+      return `vipcrusher2026-W${week}`;
+    }
+
+    document.getElementById("unlockBtn").addEventListener("click", function () {
+      const input = document.getElementById("codeInput").value;
+      const expected = getWeeklyPassword();
+      if (input === expected) {
+        document.getElementById("gate").classList.add("hidden");
+        document.getElementById("vipPanel").classList.remove("hidden");
+      } else {
+        document.getElementById("error").textContent = "Incorrect code. Try again.";
+      }
+    });
+
+    function generateVIP() {
+      document.getElementById("signals").classList.remove("hidden");
+      const output = document.getElementById("output");
+      output.innerHTML = "";
+
+      for (let i = 1; i <= 5; i++) {
+        const confidence = Math.floor(Math.random() * 21) + 80;
+        const multiplier = (Math.random() * 4 + 1).toFixed(2);
+        const countdown = Math.floor(Math.random() * 120) + 30;
+        const countdownId = `countdown${i}`;
+
+        const signal = `
+          <p class="value">⚡ Signal ${i}</p>
+          <p class="label">Confidence: <span class="value">${confidence}%</span></p>
+          <p class="label">Multiplier: <span class="value">${multiplier}x</span></p>
+          <p class="label">Countdown: <span class="value" id="${countdownId}">${countdown}s</span></p>
+          <hr style="border-color:#ff00cc;">
+        `;
+        output.innerHTML += signal;
+        startCountdown(countdownId, countdown);
+      }
+    }
+
+    function startCountdown(id, seconds) {
+      const el = document.getElementById(id);
+      const timer = setInterval(() => {
+        seconds--;
+        el.textContent = seconds + "s";
+        if (seconds <= 0) clearInterval(timer);
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
