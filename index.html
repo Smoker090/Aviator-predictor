@@ -2,161 +2,359 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MR CRUSHER PRO – Ultra Precision Detector</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MR CRUSHER PRO</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      background: radial-gradient(circle at center, #330044, #1a0026);
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f001a, #000000);
+      color: white;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Lock Screen */
+    .lock-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .lock-content {
+      background: rgba(20, 0, 40, 0.9);
+      padding: 40px;
+      border-radius: 20px;
       text-align: center;
-      padding: 20px;
+      border: 2px solid #ff00ff;
+      box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+      max-width: 90%;
+      width: 350px;
     }
-    h1 {
-      font-size: 28px;
-      color: #ff00cc;
-      margin-bottom: 5px;
+
+    .lock-content h2 {
+      color: #ff00ff;
+      margin-bottom: 15px;
+      font-size: 1.8rem;
     }
-    h2 {
-      font-size: 16px;
-      color: #ccc;
+
+    .lock-content p {
       margin-bottom: 20px;
+      color: #ff66ff;
     }
-    .btn {
-      background-color: #ff00cc;
-      color: #fff;
-      border: none;
-      padding: 12px 20px;
-      font-size: 16px;
+
+    #password-input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 2px solid #ff00ff;
+      background: #000;
+      color: white;
       border-radius: 8px;
+      font-size: 1.1rem;
+      outline: none;
+    }
+
+    #password-input:focus {
+      border-color: #ff66ff;
+      box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+    }
+
+    #unlock-btn {
+      background: linear-gradient(45deg, #ff00aa, #ff66ff);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 30px;
       cursor: pointer;
       margin-top: 10px;
+      box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
     }
-    input {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 6px;
+
+    .error {
+      color: #ff4444;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    /* Main App */
+    .main-app.hidden {
+      display: none;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header {
+      margin-bottom: 25px;
+    }
+
+    h1 {
+      font-size: 2.4rem;
+      color: #ff00ff;
+      text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .time-display {
+      font-size: 1.1rem;
+      color: #ff66ff;
+    }
+
+    #generate-btn {
+      background: linear-gradient(45deg, #ff00aa, #ff66ff);
+      color: white;
       border: none;
-      width: 80%;
-      margin-top: 10px;
+      padding: 16px 40px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      border-radius: 40px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255, 0, 255, 0.6);
+      margin: 25px 0;
+      letter-spacing: 1px;
     }
+
+    #generate-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+    }
+
     .signal-box {
-      background-color: #2a0033;
-      border: 2px solid #ff00cc;
-      border-radius: 10px;
-      padding: 15px;
-      margin: 15px auto;
-      width: 90%;
-      font-size: 18px;
-      color: #fff;
+      background: rgba(15, 0, 30, 0.85);
+      border: 2px solid #ff00ff;
+      border-radius: 16px;
+      padding: 25px;
+      margin: 25px 0;
+      box-shadow: 0 0 25px rgba(255, 0, 255, 0.4);
     }
-    .footer {
+
+    .signal-box.hidden {
+      display: none;
+    }
+
+    .signal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .label {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #ff00aa;
+    }
+
+    .confidence {
+      background: linear-gradient(90deg, #ffcc00, #ff6600);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 14px 0;
+      font-size: 1.25rem;
+    }
+
+    .value {
+      color: #ffff00;
+      font-weight: bold;
+    }
+
+    .timer {
+      color: #00ff99;
+      font-weight: bold;
+      font-size: 1.4rem;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 12px;
+      background: #200033;
+      border-radius: 6px;
+      margin-top: 20px;
+      overflow: hidden;
+    }
+
+    #progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff00aa, #00ffcc);
+      width: 0%;
+      transition: width 1s linear;
+    }
+
+    .history {
       margin-top: 30px;
-      font-size: 14px;
-      color: #aaa;
+      text-align: left;
     }
-    .flag {
-      font-size: 18px;
-      margin-left: 5px;
+
+    .history-item {
+      background: rgba(30, 0, 50, 0.7);
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border-left: 4px solid #ff00ff;
+      font-size: 0.95rem;
+      animation: fadeIn 0.4s ease;
     }
-    .status {
-      font-size: 16px;
-      color: #00ffcc;
-      margin-top: 10px;
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 500px) {
+      h1 { font-size: 2rem; }
+      .row { font-size: 1.1rem; }
+      #password-input { font-size: 1rem; }
     }
   </style>
 </head>
 <body>
 
-  <h1>⚡ MR CRUSHER PRO ⚡</h1>
-  <h2>ULTRA PRECISION DETECTOR</h2>
-  <h2>🇿🇼 Zimbabwe Time: <span id="zimTime">--:--:--</span></h2>
-
-  <div id="authSection">
-    <input type="text" id="accessCode" placeholder="Enter access code" />
-    <button class="btn" onclick="unlockBot()">Unlock Bot</button>
-    <div id="authStatus" class="status">🔐 Protected — enter code to activate</div>
+  <!-- Password Lock Screen -->
+  <div id="lock-screen" class="lock-screen">
+    <div class="lock-content">
+      <h2>🔒 ACCESS REQUIRED</h2>
+      <p>Enter password to unlock MR CRUSHER PRO</p>
+      <input type="password" id="password-input" placeholder="Password" maxlength="20" autocomplete="off" />
+      <button id="unlock-btn">UNLOCK</button>
+      <div id="error-msg" class="error"></div>
+    </div>
   </div>
 
-  <div id="mainApp" style="display:none;">
-    <button class="btn" onclick="generatePowerSignal()">GENERATE POWER SIGNAL</button>
-    <div id="status" class="status">Awaiting powerful signal... Precision detection in progress</div>
-    <div id="signalContainer"></div>
-  </div>
+  <!-- Main App -->
+  <div id="main-app" class="main-app hidden">
+    <div class="container">
+      <div class="header">
+        <h1>⚡ MR CRUSHER PRO ⚡</h1>
+        <div class="time-display">
+          🇿🇼 Zimbabwe Time: <span id="zim-time">--:--:--</span>
+        </div>
+      </div>
 
-  <div class="footer">
-    Advanced Algorithm | Real-time Analysis | Maximum Precision<br>
-    Bot expires on <strong>17 October</strong>. Use wisely.
+      <button id="generate-btn">GENERATE POWER SIGNAL</button>
+
+      <div id="signal-box" class="signal-box hidden">
+        <div class="signal-header">
+          <span class="label">🎯 POWER SIGNAL</span>
+          <span id="confidence" class="confidence">94% CONFIDENCE</span>
+        </div>
+        <div class="signal-content">
+          <div class="row">
+            <span>Multiplier:</span>
+            <span id="multiplier" class="value">7.2X</span>
+          </div>
+          <div class="row">
+            <span>Countdown:</span>
+            <span id="countdown" class="timer">108s</span>
+          </div>
+          <div class="progress-bar">
+            <div id="progress-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="history" class="history"></div>
+    </div>
   </div>
 
   <script>
-    function updateTime() {
-      const now = new Date();
-      const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Africa/Harare' };
-      const timeStr = now.toLocaleTimeString('en-GB', options);
-      document.getElementById("zimTime").textContent = timeStr;
-    }
-    setInterval(updateTime, 1000);
-    updateTime();
+    // ===== PASSWORD PROTECTION =====
+    const CORRECT_PASSWORD = "crusher2025"; // 🔑 Change this if needed
 
-    function unlockBot() {
-      const code = document.getElementById("accessCode").value.trim();
-      if (code === "crusheraccess2025") {
-        document.getElementById("authSection").style.display = "none";
-        document.getElementById("mainApp").style.display = "block";
-        document.getElementById("authStatus").textContent = "";
+    document.getElementById('unlock-btn').addEventListener('click', () => {
+      const input = document.getElementById('password-input').value;
+      const errorMsg = document.getElementById('error-msg');
+      
+      if (input === CORRECT_PASSWORD) {
+        document.getElementById('lock-screen').style.display = 'none';
+        document.getElementById('main-app').classList.remove('hidden');
+        updateZimTime(); // Start time
       } else {
-        document.getElementById("authStatus").textContent = "❌ Invalid code. Request access from Dope.";
+        errorMsg.textContent = "❌ Wrong password! Try again.";
+        setTimeout(() => errorMsg.textContent = "", 2000);
+        document.getElementById('password-input').value = "";
       }
-    }
+    });
 
-    function generatePowerSignal() {
+    document.getElementById('password-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') document.getElementById('unlock-btn').click();
+    });
+
+    // ===== ZIMBABWE TIME (UTC+2) =====
+    function updateZimTime() {
       const now = new Date();
-      const delay = Math.floor(Math.random() * 60) + 60; // 60–120s
-      const signalTime = new Date(now.getTime() + delay * 1000);
-      const hh = String(signalTime.getHours()).padStart(2, '0');
-      const mm = String(signalTime.getMinutes()).padStart(2, '0');
-      const ss = String(signalTime.getSeconds()).padStart(2, '0');
-      const timeStr = `${hh}:${mm}:${ss}`;
+      const zimTime = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+      const h = String(zimTime.getHours()).padStart(2, '0');
+      const m = String(zimTime.getMinutes()).padStart(2, '0');
+      const s = String(zimTime.getSeconds()).padStart(2, '0');
+      document.getElementById('zim-time').textContent = `${h}:${m}:${s}`;
+    }
+    setInterval(updateZimTime, 1000);
 
-      const recentRounds = [1.01, 1.03, 1.02, 1.04, 1.01];
-      const volatility = recentRounds.filter(x => x < 2.0).length / recentRounds.length;
-      const riskLevel = volatility > 0.8 ? "⚠️ High Crash Risk" : "✅ Stable";
+    // ===== SIGNAL GENERATOR =====
+    document.getElementById('generate-btn').addEventListener('click', () => {
+      const mult = parseFloat((Math.random() * 10 + 2).toFixed(1)); // 2.0 to 12.0
+      const conf = Math.floor(Math.random() * 10) + 90; // 90–99%
+      const countdownSec = Math.floor(Math.random() * 121) + 60; // 60–180s
 
-      const multiplier = (volatility > 0.8)
-        ? (Math.random() * 2 + 1).toFixed(1)
-        : (Math.random() * 4 + 3).toFixed(1);
+      document.getElementById('multiplier').textContent = `${mult}X`;
+      document.getElementById('confidence').textContent = `${conf}% CONFIDENCE`;
+      document.getElementById('countdown').textContent = `${countdownSec}s`;
+      document.getElementById('signal-box').classList.remove('hidden');
+      document.getElementById('progress-fill').style.width = '0%';
 
-      const confidence = volatility > 0.8
-        ? Math.floor(85 + Math.random() * 5)
-        : Math.floor(90 + Math.random() * 9);
-
-      const box = document.createElement("div");
-      box.className = "signal-box";
-      box.innerHTML = `
-        <strong>POWER SIGNAL</strong><br>
-        Confidence: <span style="color:#00ffcc">${confidence}%</span><br>
-        Time: <span style="color:#00ffcc">${timeStr}</span><br>
-        Multiplier: <span style="color:#00ffcc">${multiplier}X</span><br>
-        Countdown: <span id="countdown">${delay}s</span><br>
-        Risk Level: ${riskLevel}
-      `;
-      document.getElementById("signalContainer").innerHTML = "";
-      document.getElementById("signalContainer").appendChild(box);
-      document.getElementById("status").textContent = "✅ Signal generated. Prepare for entry.";
-
-      let countdown = delay;
-      const countdownEl = document.getElementById("countdown");
+      // Countdown logic
+      let timeLeft = countdownSec;
       const interval = setInterval(() => {
-        countdown--;
-        countdownEl.textContent = `${countdown}s`;
-        if (countdown <= 0) {
+        timeLeft--;
+        if (timeLeft >= 0) {
+          document.getElementById('countdown').textContent = `${timeLeft}s`;
+          const percent = ((countdownSec - timeLeft) / countdownSec) * 100;
+          document.getElementById('progress-fill').style.width = `${percent}%`;
+        } else {
           clearInterval(interval);
-          document.getElementById("status").textContent = "⚠️ Signal active now!";
+          document.getElementById('countdown').textContent = 'EXPIRED';
         }
       }, 1000);
-    }
-  </script>
 
+      // Add to history
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+      const history = document.getElementById('history');
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = `
+        <strong>✅ ${timeStr}</strong><br>
+        <span>Signal: ${mult}X | Confidence: ${conf}% | Duration: ${countdownSec}s</span>
+      `;
+      history.prepend(item);
+      if (history.children.length > 5) history.removeChild(history.lastChild);
+    });
+  </script>
 </body>
 </html>
