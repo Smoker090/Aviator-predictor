@@ -12,6 +12,9 @@
     .value { font-size:24px; color:#00ffcc; }
     .hidden { display:none; }
     input { padding:10px; font-size:18px; border-radius:6px; border:none; margin-top:10px; }
+    table { margin:auto; color:#fff; border-collapse:collapse; width:80%; }
+    th, td { border:1px solid #ff00cc; padding:8px; }
+    th { background:#330044; }
   </style>
 </head>
 <body>
@@ -29,56 +32,30 @@
     <div class="section">
       <h2>FAST SIGNAL ENGINE</h2>
       <p class="value" id="fastMultiplier">--</p>
-      <p id="fastStatus">Signal live!</p>
+      <p id="fastStatus">Waiting...</p>
+      <p>Countdown: <span id="fastCountdown">--</span></p>
       <button onclick="generateFast()">Generate Signal</button>
     </div>
 
     <div class="section">
       <h2>BIG HUNTER ENGINE</h2>
       <p class="value" id="bigMultiplier">--</p>
-      <p id="bigStatus">Big incoming in <span id="bigCountdown">--</span>s</p>
+      <p id="bigStatus">Waiting...</p>
+      <p>Countdown: <span id="bigCountdown">--</span></p>
       <button onclick="generateBig()">Catch Big</button>
+    </div>
+
+    <div class="section">
+      <h2>Signal History</h2>
+      <table id="history">
+        <tr><th>Type</th><th>Multiplier</th><th>Time</th></tr>
+      </table>
     </div>
   </div>
 
   <script>
-    // Fixed password (set it here)
+    // Fixed password
     const FIXED_PASSWORD = "crusherVIP2026";
 
     function unlock() {
-      const input = document.getElementById("passInput").value.trim();
-      if (input === FIXED_PASSWORD) {
-        document.getElementById("gate").classList.add("hidden");
-        document.getElementById("engines").classList.remove("hidden");
-      } else {
-        alert("Wrong password. Try again.");
-      }
-    }
-
-    function generateFast() {
-      const seed = Date.now().toString();
-      const hash = CryptoJS.SHA256(seed + "-fast").toString();
-      const num = parseInt(hash.slice(0,8),16);
-      const multiplier = (1.5 + (num % 1000)/1000).toFixed(2);
-      document.getElementById("fastMultiplier").textContent = multiplier + "x";
-      document.getElementById("fastStatus").textContent = "Signal live!";
-    }
-
-    function generateBig() {
-      const seed = Date.now().toString();
-      const hash = CryptoJS.SHA256(seed + "-big").toString();
-      const num = parseInt(hash.slice(0,8),16);
-      const multiplier = (5 + (num % 5000)/1000).toFixed(2);
-      document.getElementById("bigMultiplier").textContent = multiplier + "x";
-      let countdown = 105;
-      const el = document.getElementById("bigCountdown");
-      const timer = setInterval(() => {
-        countdown--;
-        el.textContent = countdown + "s";
-        if (countdown <= 0) clearInterval(timer);
-      },1000);
-      document.getElementById("bigStatus").textContent = "Big incoming!";
-    }
-  </script>
-</body>
-</html>
+      const input = document
