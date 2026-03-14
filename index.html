@@ -12,9 +12,11 @@
     .value { font-size:24px; color:#00ffcc; }
     .hidden { display:none; }
     input { padding:10px; font-size:18px; border-radius:6px; border:none; margin-top:10px; }
-    table { margin:auto; color:#fff; border-collapse:collapse; width:80%; }
-    th, td { border:1px solid #ff00cc; padding:8px; }
+    table { margin:auto; color:#fff; border-collapse:collapse; width:90%; }
+    th, td { border:1px solid #ff00cc; padding:8px; text-align:center; }
     th { background:#330044; }
+    .progress-container { width:80%; background:#330044; border-radius:10px; margin:10px auto; }
+    .progress-bar { height:20px; background:#00ffcc; width:0%; border-radius:10px; }
   </style>
 </head>
 <body>
@@ -24,7 +26,7 @@
   <div id="gate" class="section">
     <p>🔒 ACCESS REQUIRED</p>
     <input type="password" id="passInput" placeholder="Enter VIP password" />
-    <button onclick="unlock()">UNLOCK</button>
+    <button id="unlockBtn">UNLOCK</button>
   </div>
 
   <!-- Engines -->
@@ -32,24 +34,29 @@
     <div class="section">
       <h2>FAST SIGNAL ENGINE</h2>
       <p class="value" id="fastMultiplier">--</p>
+      <p id="fastConfidence">Confidence: --</p>
       <p id="fastStatus">Waiting...</p>
       <p>Countdown: <span id="fastCountdown">--</span></p>
+      <div class="progress-container"><div id="fastBar" class="progress-bar"></div></div>
       <button onclick="generateFast()">Generate Signal</button>
     </div>
 
     <div class="section">
       <h2>BIG HUNTER ENGINE</h2>
       <p class="value" id="bigMultiplier">--</p>
+      <p id="bigConfidence">Confidence: --</p>
       <p id="bigStatus">Waiting...</p>
       <p>Countdown: <span id="bigCountdown">--</span></p>
+      <div class="progress-container"><div id="bigBar" class="progress-bar"></div></div>
       <button onclick="generateBig()">Catch Big</button>
     </div>
 
     <div class="section">
       <h2>Signal History</h2>
       <table id="history">
-        <tr><th>Type</th><th>Multiplier</th><th>Time</th></tr>
+        <tr><th>Type</th><th>Multiplier</th><th>Confidence</th><th>Time</th></tr>
       </table>
+      <button onclick="resetHistory()">Reset History</button>
     </div>
   </div>
 
@@ -57,5 +64,85 @@
     // Fixed password
     const FIXED_PASSWORD = "crusherVIP2026";
 
-    function unlock() {
-      const input = document
+    // Unlock button handler
+    document.getElementById("unlockBtn").addEventListener("click", function() {
+      const input = document.getElementById("passInput").value.trim();
+      if (input === FIXED_PASSWORD) {
+        document.getElementById("gate").classList.add("hidden");
+        document.getElementById("engines").classList.remove("hidden");
+      } else {
+        alert("Wrong password. Try again.");
+      }
+    });
+
+    function startCountdown(id, barId, seconds, callback) {
+      const el = document.getElementById(id);
+      const bar = document.getElementById(barId);
+      let remaining = seconds;
+      el.textContent = remaining + "s";
+      bar.style.width = "0%";
+      const timer = setInterval(() => {
+        remaining--;
+        el.textContent = remaining + "s";
+        const progress = ((seconds - remaining) / seconds) * 100;
+        bar.style.width = progress + "%";
+        if (remaining <= 0) {
+          clearInterval(timer);
+          bar.style.width = "100%";
+          callback();
+        }
+      }, 1000);
+    }
+
+    function confidenceLevel(multiplier) {
+      if (multiplier >= 7) return "High";
+      if (multiplier >= 3) return "Medium";
+      return "Low";
+    }
+
+    function logSignal(type, multiplier, confidence) {
+      const table = document.getElementById("history");
+      const row = table.insertRow(-1);
+      row.insertCell(0).textContent = type;
+      row.insertCell(1).textContent = multiplier + "x";
+      row.insertCell(2).textContent = confidence;
+      row.insertCell(3).textContent = new Date().toLocaleTimeString();
+    }
+
+    function resetHistory() {
+      const table = document.getElementById("history");
+      table.innerHTML = "<tr><th>Type</th><th>Multiplier</th><th>Confidence</th><th>Time</th></tr>";
+    }
+
+    function generateFast() {
+      document.getElementById("fastStatus").textContent = "Countdown started...";
+      startCountdown("fastCountdown", "fastBar", 15, () => {
+        const seed = Date.now().toString();
+        const hash = CryptoJS.SHA256(seed + "-fast").toString();
+        const num = parseInt(hash.slice(0,8),16);
+        const multiplier = (1.5 + (num % 1000)/1000).toFixed(2);
+        const conf = confidenceLevel(multiplier);
+        document.getElementById("fastMultiplier").textContent = multiplier + "x";
+        document.getElementById("fastConfidence").textContent = "Confidence: " + conf;
+        document.getElementById("fastStatus").textContent = "Signal live!";
+        logSignal("FAST", multiplier, conf);
+      });
+    }
+
+    function generateBig() {
+      document.getElementById("bigStatus").textContent = "Countdown started...";
+      startCountdown("bigCountdown", "bigBar", 30, () => {
+        const seed = Date.now().toString();
+        const hash = CryptoJS.SHA256(seed + "-big").toString();
+        const num = parseInt(hash.slice(0,8),16);
+        const multiplier = (5 + (num % 5000)/1000).toFixed(2);
+        const conf = confidenceLevel(multiplier);
+        document.getElementById("bigMultiplier").textContent = multiplier + "x";
+        document.getElementById("bigConfidence").textContent = "Confidence: " + conf;
+        document.getElementById("bigStatus").textContent = "Big incoming!";
+        logSignal("BIG", multiplier, conf);
+      });
+    }
+  </script>
+</body>
+</html>
