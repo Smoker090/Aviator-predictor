@@ -1,56 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MR CRUSHER EMPIRE</title>
+  <title>MR CRUSHER PRO — VIP Bot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <style>
-    body { font-family: Arial; text-align: center; padding: 50px; background: #111; color: #fff; }
-    .hidden { display: none; }
-    input, button { padding: 10px; font-size: 16px; }
-    #signalBox { margin-top: 30px; }
+    body { background:#0a001f; color:#fff; font-family:Arial; text-align:center; padding:40px; }
+    h1 { color:#ff00cc; font-size:32px; }
+    .section { margin-top:30px; border:2px solid #ff00cc; padding:20px; border-radius:10px; }
+    button { background:#ff00cc; color:#fff; border:none; padding:12px 24px; font-size:18px; border-radius:8px; cursor:pointer; }
+    .value { font-size:24px; color:#00ffcc; }
+    .hidden { display:none; }
+    input { padding:10px; font-size:18px; border-radius:6px; border:none; margin-top:10px; }
   </style>
 </head>
 <body>
-  <h1>MR CRUSHER EMPIRE</h1>
+  <h1>⚡ MR CRUSHER PRO ⚡<br>FAST + BIG Engines</h1>
 
-  <div id="gate">
-    <p>Enter Access Code:</p>
-    <input type="password" id="codeInput" placeholder="Enter password" />
-    <button onclick="checkCode()">Unlock</button>
-    <p id="error" style="color:red;"></p>
-  </div>
-
-  <div id="signalBox" class="hidden">
-    <h2>Live Crash Signal</h2>
-    <p>Multiplier: <span id="multiplier">Loading...</span></p>
-    <p>Confidence: <span id="confidence">...</span></p>
-    <p>Risk Level: <span id="risk">...</span></p>
-  </div>
-
-  <script>
-    const backendURL = "https://aviator-predictor-production-2b20.up.railway.app/";
-
-    function checkCode() {
-      const input = document.getElementById("codeInput").value;
-      if (input === "mrcrusher2026") {
-        document.getElementById("gate").classList.add("hidden");
-        document.getElementById("signalBox").classList.remove("hidden");
-        fetchSignal();
-        setInterval(fetchSignal, 30000);
-      } else {
-        document.getElementById("error").textContent = "Incorrect code. Try again.";
-      }
-    }
-
-    function fetchSignal() {
-      fetch(backendURL)
-        .then(res => res.json())
-        .then(data => {
-          const crash = data.crashPoint || "N/A";
-          document.getElementById("multiplier").textContent = crash;
-          document.getElementById("confidence").textContent = "Live";
-          document.getElementById("risk").textContent = parseFloat(crash) < 1.5 ? "High" : "Low";
-        });
-    }
-  </script>
-</body>
-</html>
+  <!-- Password Gate -->
+  <div id="gate" class="section">
+    <p>🔒 ACCESS REQUIRED</p>
